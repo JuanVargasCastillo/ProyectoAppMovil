@@ -4,11 +4,11 @@ plugins {
 }
 
 android { // Bloque principal de configuración Android
-    namespace = "com.miapp.xanostorekotlin" // Paquete base para R y BuildConfig
+    namespace = "com.miapp.greenbunny" // Paquete base para R y BuildConfig
     compileSdk = 36 // API level de compilación (Android 15)
 
     defaultConfig { // Configuración por defecto del módulo app
-        applicationId = "com.miapp.xanostorekotlin" // ID único del paquete de la app
+        applicationId = "com.miapp.greenbunny" // ID único del paquete de la app
         minSdk = 24 // Mínimo nivel de API soportado
         targetSdk = 36 // Nivel de API objetivo
         versionCode = 1 // Código de versión para Play Store
