@@ -69,7 +69,7 @@ XanoStoreKotlin/
 ```
 
 ## Configuración de Android y Gradle
-- `namespace`: `com.miapp.xanostorekotlin`
+- `namespace`: `greenbunny`
 - `compileSdk`: 36, `minSdk`: 24, `targetSdk`: 36
 - `compileOptions`: `JavaVersion.VERSION_11`
 - `kotlinOptions`: `jvmTarget = "11"`
