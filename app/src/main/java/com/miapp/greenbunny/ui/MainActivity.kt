@@ -1,116 +1,137 @@
-package com.miapp.greenbunny.ui // Paquete donde vive la Activity de login
+package com.miapp.greenbunny.ui
 
 import android.content.Context
-import android.content.Intent // Import para navegar a otra Activity
-import android.os.Bundle // Import para ciclo de vida y estado
+import android.content.Intent
+import android.os.Bundle
 import android.util.Log
-import android.view.View // Import para manipular visibilidad de vistas
-import android.widget.Toast // Import para notificaciones cortas
-import androidx.appcompat.app.AppCompatActivity // Activity base compatible
-import androidx.lifecycle.lifecycleScope // Alcance de corrutinas ligado al ciclo de vida
-import com.miapp.greenbunny.api.RetrofitClient // Cliente Retrofit centralizado
-import com.miapp.greenbunny.api.TokenManager // Gestor de token/usuario
-import com.miapp.greenbunny.databinding.ActivityMainBinding // ViewBinding del layout activity_main.xml
-import com.miapp.greenbunny.model.LoginRequest // Modelo para enviar email y password
-import kotlinx.coroutines.Dispatchers // Dispatcher para correr en IO
-import kotlinx.coroutines.launch // Lanzar corrutinas
-import kotlinx.coroutines.withContext // Cambiar contexto dentro de corrutinas
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.miapp.greenbunny.api.RetrofitClient
+import com.miapp.greenbunny.api.TokenManager
+import com.miapp.greenbunny.databinding.ActivityMainBinding
+import com.miapp.greenbunny.model.LoginRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.regex.Pattern
 
-/**
- * MainActivity (Login)
- *
- * Explicación:
- * - Muestra un formulario de email y password.
- * - Al presionar el botón, llama al endpoint de login usando corrutinas.
- * - Si el login es exitoso, guarda el token y datos del usuario y navega a HomeActivity.
- * - Se utiliza ViewBinding para acceder a las vistas y lifecycleScope para las corrutinas.
- */
-class MainActivity : AppCompatActivity() { // Activity principal de login
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding // Referencia a ViewBinding para acceder a vistas
-    private lateinit var tokenManager: TokenManager // Manejador de sesión/token del usuario
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var tokenManager: TokenManager
 
-    override fun onCreate(savedInstanceState: Bundle?) { // Ciclo de vida: creación de la Activity
-        super.onCreate(savedInstanceState) // Llamamos al métodoo base
-        binding = ActivityMainBinding.inflate(layoutInflater) // Inflamos el layout con ViewBinding
-        setContentView(binding.root) // Establecemos el contenido de la Activity
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        tokenManager = TokenManager(this) // Inicializamos TokenManager con contexto
+        tokenManager = TokenManager(this)
 
-        // Si ya hay sesión, vamos directo a Home
-        if (tokenManager.isLoggedIn()) { // Consultamos si hay token guardado
-            goToHome() // Navegamos a Home
-            return // Terminamos onCreate para no mostrar login
+        // Si ya hay sesión activa, vamos directo a Home
+        if (tokenManager.isLoggedIn()) {
+            goToHome()
+            return
         }
 
-        binding.btnLogin.setOnClickListener { // Click en botón Login
-            val email = binding.etEmail.text?.toString()?.trim().orEmpty() // Obtenemos email
-            val password = binding.etPassword.text?.toString()?.trim().orEmpty() // Obtenemos password
+        binding.btnLogin.setOnClickListener {
+            val email = binding.etEmail.text?.toString()?.trim().orEmpty()
+            val password = binding.etPassword.text?.toString()?.trim().orEmpty()
 
-            if (email.isBlank() || password.isBlank()) { // Validación simple
-                Toast.makeText(this, "Completa email y password", Toast.LENGTH_SHORT).show() // Feedback
-                return@setOnClickListener // No seguimos si faltan datos
+            // --- VALIDACIONES EN LA APP ---
+            if (email.isBlank() || password.isBlank()) {
+                Toast.makeText(this, "Completa email y contraseña", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            // Mostramos progreso
-            binding.progress.visibility = View.VISIBLE // Indicador visible
-            binding.btnLogin.isEnabled = false // Bloqueamos botón para evitar múltiples clics
+            if (!isValidEmail(email)) {
+                Toast.makeText(this, "Correo inválido. Debe tener formato usuario@dominio.com", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
 
-            // Corrutina para llamar a la API de login
+            if (!isValidPassword(password)) {
+                Toast.makeText(
+                    this,
+                    "Contraseña inválida: mínimo 8 caracteres, 1 mayúscula, 1 número y 1 carácter especial",
+                    Toast.LENGTH_LONG
+                ).show()
+                return@setOnClickListener
+            }
+
+            // --- MOSTRAR PROGRESO ---
+            binding.progress.visibility = View.VISIBLE
+            binding.btnLogin.isEnabled = false
+
+            // --- LLAMADA AL BACKEND ---
             lifecycleScope.launch {
                 try {
-                    // --- FASE 1: LOGIN (usando el servicio PÚBLICO) ---
-                    // Llamamos a createAuthService sin el segundo parámetro (o con 'false'),
-                    // para obtener un servicio sin token.
                     val publicAuthService = RetrofitClient.createAuthService(this@MainActivity)
                     val loginResponse = withContext(Dispatchers.IO) {
                         publicAuthService.login(LoginRequest(email = email, password = password))
                     }
 
-                    // --- PASO CLAVE: GUARDADO DEL TOKEN ---
                     val authToken = loginResponse.authToken
 
-                    // --- PASO CLAVE: GUARDADO TEMPORAL MANUAL ---
-                    // Guardamos el token en SharedPreferences para que la siguiente llamada lo encuentre.
+                    // Guardar token temporalmente
                     getSharedPreferences("session", Context.MODE_PRIVATE).edit().apply {
                         putString("jwt_token", authToken)
                         apply()
                     }
 
-                    // --- FASE 2: OBTENCIÓN DE DATOS (usando el servicio PRIVADO) ---
-                    // Ahora llamamos a createAuthService con 'requiresAuth = true'.
-                    // Esto creará un servicio que SÍ incluye el interceptor con el token.
-                    val privateAuthService = RetrofitClient.createAuthService(this@MainActivity, requiresAuth = true)
+                    // Obtener perfil con token
+                    val privateAuthService =
+                        RetrofitClient.createAuthService(this@MainActivity, requiresAuth = true)
                     val userProfile = withContext(Dispatchers.IO) {
-                        privateAuthService.getMe() // ¡Esta llamada ahora funcionará!
+                        privateAuthService.getMe()
                     }
 
-                    // --- FASE 3: GUARDADO COMPLETO Y FORMAL ---
                     tokenManager.saveAuth(
                         token = authToken,
                         userName = userProfile.name,
                         userEmail = userProfile.email
                     )
 
-                    // --- FASE 4: BIENVENIDA Y NAVEGACIÓN ---
-                    Toast.makeText(this@MainActivity, "¡Bienvenido, ${userProfile.name}!", Toast.LENGTH_SHORT).show()
-                    goToHome() // Navegamos a Home
+                    Toast.makeText(
+                        this@MainActivity,
+                        "¡Bienvenido, ${userProfile.name}!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    goToHome()
 
                 } catch (e: Exception) {
                     Log.e("MainActivity", "Login o GetProfile error", e)
                     Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-                    tokenManager.clear() // Si falla, limpiamos el token
+                    tokenManager.clear()
                 } finally {
-                    binding.progress.visibility = View.GONE // Indicador invisible
+                    binding.progress.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
                 }
             }
         }
     }
 
-    private fun goToHome() { // Navegar a la pantalla de Home
-        val intent = Intent(this, HomeActivity::class.java) // Creamos el Intent explícito
-        startActivity(intent) // Lanzamos la nueva Activity
-        finish() // Cerramos la Activity actual para no volver con back
+    private fun goToHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    // --- FUNCIONES DE VALIDACIÓN ---
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailPattern = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
+        return emailPattern.matches(email)
+    }
+
+    private fun isValidPassword(password: String): Boolean {
+        if (password.length < 8) return false
+        val uppercase = Pattern.compile("[A-Z]")
+        val number = Pattern.compile("[0-9]")
+        val special = Pattern.compile("[^A-Za-z0-9]")
+        return uppercase.matcher(password).find() &&
+                number.matcher(password).find() &&
+                special.matcher(password).find()
     }
 }

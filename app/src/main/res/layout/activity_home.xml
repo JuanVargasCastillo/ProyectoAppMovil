@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:text="Bienvenido"/>
+        android:text="Bienvenido" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
