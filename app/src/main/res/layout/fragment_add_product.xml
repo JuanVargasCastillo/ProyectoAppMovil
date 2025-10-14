@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
@@ -26,7 +27,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                tools:text="Polera Verde" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Descripción -->
@@ -46,7 +48,8 @@
                 android:inputType="textMultiLine"
                 android:minLines="3"
                 android:gravity="top"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                tools:text="Polera verde de algodón, talla M." />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Precio -->
@@ -64,7 +67,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                tools:text="12990" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Botón para seleccionar imágenes -->
@@ -87,8 +91,8 @@
             android:orientation="horizontal"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="3"
             tools:listitem="@layout/item_image_preview"
+            tools:itemCount="3"
             tools:visibility="visible" />
 
         <!-- Botón de Enviar -->
@@ -109,6 +113,5 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:visibility="gone"/>
-
     </LinearLayout>
 </ScrollView>
