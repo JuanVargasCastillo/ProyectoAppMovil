@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F8F8F8"
     android:padding="16dp">
 
-    <!-- Carrusel de imágenes -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/imageViewPager"
+    <!-- Imagen del producto -->
+    <ImageView
+        android:id="@+id/imgProduct"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginBottom="16dp"
-        android:clipToPadding="false"
-        android:clipChildren="false"
-        android:overScrollMode="never"/>
+        android:scaleType="centerCrop"
+        android:contentDescription="Imagen del producto"
+        android:src="@android:drawable/ic_menu_gallery"
+        android:layout_marginBottom="16dp"/>
 
     <!-- Nombre -->
     <TextView
@@ -60,7 +59,7 @@
         android:textColor="#555555"
         android:layout_marginBottom="20dp"/>
 
-    <!-- Botón volver (por si no quieres depender solo de la ActionBar) -->
+    <!-- Botón volver -->
     <Button
         android:id="@+id/btnVolver"
         android:layout_width="match_parent"
@@ -68,7 +67,5 @@
         android:text="Volver"
         android:backgroundTint="@color/rosa_claro"
         android:textColor="@android:color/white"
-        android:layout_marginTop="8dp"
-        android:onClick="onBackPressed"/>
-
+        android:layout_marginTop="8dp"/>
 </LinearLayout>
