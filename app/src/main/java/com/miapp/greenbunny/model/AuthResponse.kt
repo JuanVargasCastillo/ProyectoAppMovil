@@ -1,11 +1,6 @@
-package com.miapp.greenbunny.model // Paquete de modelos relacionados a autenticación
+package com.miapp.greenbunny.model
 
-/**
- * AuthResponse
- * Respuesta del endpoint de login.
- * Se asume que devuelve un token y un objeto usuario.
- * Comentado línea por línea para fines educativos.
- */
-data class AuthResponse( // data class para la respuesta de login
-    val authToken: String, // Token devuelto por el backend (JWT/JWE)
+data class AuthResponse(
+    val token: String, // Aquí Xano devuelve el JWT
+    val user: User     // Objeto con id, name, email
 )

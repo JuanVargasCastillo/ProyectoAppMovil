@@ -15,9 +15,10 @@ android { // Bloque principal de configuración Android
         versionName = "1.0" // Nombre de versión mostrado
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" // Runner para tests instrumentados
-        // Configuración de endpoints Xano (reemplaza los valores por los tuyos)
-        buildConfigField("String", "XANO_STORE_BASE", "\"https://x8ki-letl-twmt.n7.xano.io/api:3Xncgo9I/\"") // Base URL Store (Xano)
-        buildConfigField("String", "XANO_AUTH_BASE", "\"https://x8ki-letl-twmt.n7.xano.io/api:PDQSRKQT/\"") // Base URL Auth (Xano)
+
+        // ✅ Configuración de endpoints Green Bunny
+        buildConfigField("String", "XANO_STORE_BASE", "\"https://x8ki-letl-twmt.n7.xano.io/api:Ybbgn3cq/\"") // Base URL productos
+        buildConfigField("String", "XANO_AUTH_BASE", "\"https://x8ki-letl-twmt.n7.xano.io/api:iHS4Ivne/\"") // Base URL autenticación
         buildConfigField("int", "XANO_TOKEN_TTL_SEC", "86400") // TTL de token simulado
     }
 
@@ -30,13 +31,16 @@ android { // Bloque principal de configuración Android
             )
         }
     }
+
     compileOptions { // Opciones de compatibilidad Java
         sourceCompatibility = JavaVersion.VERSION_11 // Compilar con Java 11
         targetCompatibility = JavaVersion.VERSION_11 // Target Java 11
     }
+
     kotlinOptions { // Opciones del compilador Kotlin
         jvmTarget = "11" // Bytecode objetivo Java 11
     }
+
     buildFeatures { // Activamos features del módulo
         viewBinding = true // Generación de clases de binding por layout
         buildConfig = true // Generación de BuildConfig con campos custom
@@ -44,7 +48,6 @@ android { // Bloque principal de configuración Android
 }
 
 dependencies { // Dependencias del módulo
-
     implementation(libs.androidx.core.ktx) // Extensiones Kotlin para Android core
     implementation(libs.androidx.appcompat) // Compatibilidad de componentes UI
     implementation(libs.material) // Componentes Material Design
