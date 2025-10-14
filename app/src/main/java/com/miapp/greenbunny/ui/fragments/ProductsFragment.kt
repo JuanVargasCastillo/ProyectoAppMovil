@@ -1,100 +1,87 @@
-package com.miapp.greenbunny.ui.fragments // Paquete para los fragments de la app
+package com.miapp.greenbunny.ui.fragments
 
-import android.os.Bundle // Import para estado y ciclo de vida de fragment
-import android.view.LayoutInflater // Import para inflar layouts
-import android.view.View // Import básico de View
-import android.view.ViewGroup // Import del contenedor padre
-import androidx.appcompat.widget.SearchView // Import de la barra de búsqueda
-import androidx.fragment.app.Fragment // Clase base Fragment
-import androidx.lifecycle.lifecycleScope // Alcance de corrutinas atado al ciclo de vida
-import androidx.recyclerview.widget.LinearLayoutManager // Layout manager lineal para RecyclerView
-import com.miapp.greenbunny.api.RetrofitClient // Cliente centralizado de Retrofit
-import com.miapp.greenbunny.databinding.FragmentProductsBinding // ViewBinding del layout fragment_products.xml
-import com.miapp.greenbunny.model.Product // Modelo de producto
-import com.miapp.greenbunny.ui.adapter.ProductAdapter // Adaptador para el RecyclerView
-import kotlinx.coroutines.Dispatchers // Dispatcher para IO
-import kotlinx.coroutines.launch // Lanzador de corrutinas
-import kotlinx.coroutines.withContext // Cambio de contexto en corrutinas
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.miapp.greenbunny.api.RetrofitClient
+import com.miapp.greenbunny.databinding.FragmentProductsBinding
+import com.miapp.greenbunny.model.Product
+import com.miapp.greenbunny.ui.adapter.ProductAdapter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-/**
- * ProductsFragment
- *
- * Explicación:
- * - Obtiene la lista de productos desde la API de Xano usando corrutinas.
- * - Muestra los productos en un RecyclerView.
- * - Incluye una barra de búsqueda para buscar por nombre (filtrado local).
- */
-class ProductsFragment : Fragment() { // Fragment que lista y filtra productos
+class ProductsFragment : Fragment() {
 
-    private var _binding: FragmentProductsBinding? = null // Backing field opcional para ViewBinding
-    private val binding get() = _binding!! // Exponemos binding no-null dentro del ciclo de vida de la vista
+    private var _binding: FragmentProductsBinding? = null
+    private val binding get() = _binding!!
 
-    private lateinit var adapter: ProductAdapter // Adaptador de productos
-    private var allProducts: List<Product> = emptyList() // Cache local de todos los productos
+    private lateinit var adapter: ProductAdapter
+    private var allProducts: List<Product> = emptyList()
 
-    override fun onCreateView( // Inflamos la vista del fragment
-        inflater: LayoutInflater, // Inflater para convertir XML en Views
-        container: ViewGroup?, // Contenedor padre
-        savedInstanceState: Bundle? // Estado guardado
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentProductsBinding.inflate(inflater, container, false) // Inflamos con ViewBinding
-        return binding.root // Devolvemos la raíz de la vista
+        _binding = FragmentProductsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { // Vista creada: configuramos UI y carga
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRecycler() // Preparamos RecyclerView
-        setupSearch() // Configuramos barra de búsqueda
-        loadProducts() // Cargamos datos desde API
+        setupRecycler()
+        setupSearch()
+        loadProducts()
     }
 
-    private fun setupRecycler() { // Inicializa RecyclerView con layout manager y adaptador
-        adapter = ProductAdapter() // Instanciamos adaptador simple
-        binding.recyclerProducts.layoutManager = LinearLayoutManager(requireContext()) // Lista vertical
-        binding.recyclerProducts.adapter = adapter // Asociamos adaptador
+    private fun setupRecycler() {
+        adapter = ProductAdapter()
+        binding.recyclerProducts.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerProducts.adapter = adapter
     }
 
-    private fun setupSearch() { // Configura callbacks de búsqueda
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener { // Listener de texto
-            override fun onQueryTextSubmit(query: String?): Boolean { // Al enviar búsqueda
-                filter(query) // Aplicamos filtro
-                return true // Indicamos que manejamos el evento
+    private fun setupSearch() {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filter(query)
+                return true
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean { // Mientras cambia el texto
-                filter(newText) // Aplicamos filtro en tiempo real
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filter(newText)
                 return true
             }
         })
     }
 
-    private fun filter(query: String?) { // Filtra lista local por nombre
-        val q = query?.trim()?.lowercase().orEmpty() // Normalizamos query a minúsculas
-        if (q.isBlank()) { // Si vacío, mostramos todos
-            adapter.updateData(allProducts) // Reset
-        } else {
-            adapter.updateData(allProducts.filter { it.name.lowercase().contains(q) }) // Filtro simple
-        }
+    private fun filter(query: String?) {
+        val q = query?.trim()?.lowercase().orEmpty()
+        adapter.updateData(if (q.isBlank()) allProducts else allProducts.filter {
+            it.name.lowercase().contains(q)
+        })
     }
 
-    private fun loadProducts() { // Carga productos desde API con corrutinas
-        // Corrutina para carga de productos
-        viewLifecycleOwner.lifecycleScope.launch { // Lanzamos en el ciclo de vida del fragment
+    private fun loadProducts() {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val service = RetrofitClient.createProductService(requireContext()) // Obtenemos servicio de productos
-                val products = withContext(Dispatchers.IO) { // Ejecutamos llamada en hilo de IO
-                    service.getProducts() // GET /products
+                val service = RetrofitClient.createProductService(requireContext())
+                val products = withContext(Dispatchers.IO) {
+                    service.getProducts()
                 }
-                allProducts = products // Guardamos lista completa
-                adapter.updateData(products) // Actualizamos la UI
+                allProducts = products
+                adapter.updateData(products)
             } catch (e: Exception) {
-                // Podrías mostrar un Snackbar/Toast en caso de error
+                // Manejo de errores (Snackbar/Toast)
             }
         }
     }
 
-    override fun onDestroyView() { // Limpieza de ViewBinding para evitar memory leaks
+    override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null // Nulificamos binding cuando se destruye la vista
+        _binding = null
     }
 }
