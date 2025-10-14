@@ -71,7 +71,8 @@ class MainActivity : AppCompatActivity() {
                         publicAuthService.login(LoginRequest(email = email, password = password))
                     }
 
-                    val authToken = loginResponse.authToken
+                    val authToken = loginResponse.token   // ✅ cambio aquí
+                    val userProfile = loginResponse.user  // ✅ cambio aquí
 
                     // Guardar token temporalmente
                     getSharedPreferences("session", Context.MODE_PRIVATE).edit().apply {
@@ -79,13 +80,7 @@ class MainActivity : AppCompatActivity() {
                         apply()
                     }
 
-                    // Obtener perfil con token
-                    val privateAuthService =
-                        RetrofitClient.createAuthService(this@MainActivity, requiresAuth = true)
-                    val userProfile = withContext(Dispatchers.IO) {
-                        privateAuthService.getMe()
-                    }
-
+                    // Guardar usuario en TokenManager
                     tokenManager.saveAuth(
                         token = authToken,
                         userName = userProfile.name,
@@ -94,14 +89,14 @@ class MainActivity : AppCompatActivity() {
 
                     Toast.makeText(
                         this@MainActivity,
-                        "¡Bienvenido, ${userProfile.name}!",
+                        "¡Bienvenido, ${userProfile.name}! 🎉",
                         Toast.LENGTH_SHORT
                     ).show()
 
                     goToHome()
 
                 } catch (e: Exception) {
-                    Log.e("MainActivity", "Login o GetProfile error", e)
+                    Log.e("MainActivity", "Login error", e)
                     Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                     tokenManager.clear()
                 } finally {
@@ -119,7 +114,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     // --- FUNCIONES DE VALIDACIÓN ---
-
     private fun isValidEmail(email: String): Boolean {
         val emailPattern = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
         return emailPattern.matches(email)
