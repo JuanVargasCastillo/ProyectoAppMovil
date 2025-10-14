@@ -1,31 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Fragmento de Perfil: muestra nombre y email del usuario -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/ivProfile"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_profile_placeholder"
+        android:scaleType="centerCrop"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:id="@+id/tvName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:text="Nombre"/>
+        android:text="Nombre"
+        android:textColor="@color/black" />
 
     <TextView
         android:id="@+id/tvEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Email"/>
+        android:text="Email"
+        android:textColor="@color/black" />
 
-    <!-- Botón de cerrar sesión -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:stateListAnimator="@null"
         android:text="Cerrar sesión"
-        android:layout_marginTop="16dp"/>
+        android:textColor="@color/black"
+        app:cornerRadius="16dp"
+        android:backgroundTint="@color/btn_logout_selector" />
 
 </LinearLayout>
