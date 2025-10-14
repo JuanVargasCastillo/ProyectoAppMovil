@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragments.AddProductFragment">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,27 +13,33 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Campo para el Nombre del producto -->
+        <!-- Nombre del Producto -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre del Producto">
+            android:hint="Nombre del Producto"
+            app:boxStrokeColor="@color/verde_claro"
+            app:hintTextColor="@color/verde_claro">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords" />
+                android:inputType="textCapWords"
+                android:textColor="@color/black"
+                tools:text="Polera Verde" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- ¡AÑADIDO! Campo para la Descripción del producto -->
+        <!-- Descripción -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Descripción">
+            android:hint="Descripción"
+            app:boxStrokeColor="@color/verde_claro"
+            app:hintTextColor="@color/verde_claro">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDescription"
@@ -40,22 +47,28 @@
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:minLines="3"
-                android:gravity="top"/>
+                android:gravity="top"
+                android:textColor="@color/black"
+                tools:text="Polera verde de algodón, talla M." />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- ¡AÑADIDO! Campo para el Precio del producto -->
+        <!-- Precio -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Precio">
+            android:hint="Precio"
+            app:boxStrokeColor="@color/verde_claro"
+            app:hintTextColor="@color/verde_claro">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:textColor="@color/black"
+                tools:text="12990" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Botón para seleccionar imágenes -->
@@ -65,9 +78,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Seleccionar Imágenes" />
+            android:text="Seleccionar Imagen"
+            android:textColor="@color/verde_claro"
+            app:strokeColor="@color/verde_claro"/>
 
-        <!-- RecyclerView para mostrar la vista previa de las imágenes seleccionadas -->
+        <!-- RecyclerView para vista previa de imágenes -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvImagePreview"
             android:layout_width="match_parent"
@@ -76,8 +91,8 @@
             android:orientation="horizontal"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="3"
             tools:listitem="@layout/item_image_preview"
+            tools:itemCount="3"
             tools:visibility="visible" />
 
         <!-- Botón de Enviar -->
@@ -86,7 +101,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Crear Producto" />
+            android:text="Crear Producto"
+            android:backgroundTint="@color/verde_claro"
+            android:textColor="@color/white"/>
 
         <!-- Barra de Progreso -->
         <ProgressBar
@@ -95,7 +112,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
-            android:visibility="gone" />
-
+            android:visibility="gone"/>
     </LinearLayout>
 </ScrollView>
