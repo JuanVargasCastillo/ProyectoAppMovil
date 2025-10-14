@@ -3,9 +3,9 @@
     <!-- Tu paleta -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="green_primary">#bfd64f</color>      <!-- Verde claro -->
-    <color name="pink_pastel">#fdbfd3</color>       <!-- Rosa pastel -->
-    <color name="pink_light">#ffd8e7</color>        <!-- Rosa claro -->
+    <color name="verde_claro">#bfd64f</color>      <!-- Verde claro -->
+    <color name="rosa_pastel">#fdbfd3</color>       <!-- Rosa pastel -->
+    <color name="rosa_claro">#ffd8e7</color>        <!-- Rosa claro -->
 
     <!-- Paleta de tu pareja / extras -->
     <color name="verde_secundario">#bfd64f</color>
