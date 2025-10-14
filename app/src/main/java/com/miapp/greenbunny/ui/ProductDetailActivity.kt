@@ -38,21 +38,12 @@ class ProductDetailActivity : AppCompatActivity() {
         binding.tvProductDescription.text = "Descripción: ${product.description ?: "Sin descripción"}"
         binding.tvProductStock.text = "Stock: ${product.stock ?: "No especificado"}"
 
-        // Cargar la primera imagen en el ViewPager2 usando un ImageView temporal
-        // Aquí creamos un pequeño truco: el ViewPager2 no puede usar Coil directamente,
-        // así que simplemente reemplazamos su contenido por un ImageView con la imagen principal
-        val firstImageUrl = product.images?.firstOrNull()?.url
-        if (firstImageUrl != null) {
-            val imageView = androidx.appcompat.widget.AppCompatImageView(this).apply {
-                layoutParams = binding.imageViewPager.layoutParams
-                scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-                load(firstImageUrl) {
-                    placeholder(android.R.drawable.ic_menu_gallery)
-                    error(android.R.drawable.ic_dialog_alert)
-                }
+        // Mostrar la primera imagen del producto
+        product.images?.firstOrNull()?.url?.let {
+            binding.imgProduct.load(it) {
+                placeholder(android.R.drawable.ic_menu_gallery)
+                error(android.R.drawable.ic_dialog_alert)
             }
-            binding.imageViewPager.removeAllViews()
-            binding.imageViewPager.addView(imageView)
         }
     }
 
