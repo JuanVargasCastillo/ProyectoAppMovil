@@ -50,7 +50,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:elevation="8dp"
-        app:itemIconTint="@color/green_primary"
-        app:itemTextColor="@color/green_primary"
+        app:itemIconTint="@color/verde_claro"
+        app:itemTextColor="@color/verde_claro"
         app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

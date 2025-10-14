@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"
         android:queryHint="Buscar productos"
         android:iconifiedByDefault="false"
-        android:backgroundTint="@color/green_primary"
-        android:queryBackground="@color/pink_light"
+        android:backgroundTint="@color/verde_claro"
+        android:queryBackground="@color/rosa_claro"
         android:textColor="@color/black"
-        android:textColorHint="@color/green_primary"
+        android:textColorHint="@color/verde_claro"
         />
 
     <!-- RecyclerView de productos -->

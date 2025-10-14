@@ -19,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nombre del Producto"
-            app:boxStrokeColor="@color/green_primary"
-            app:hintTextColor="@color/green_primary">
+            app:boxStrokeColor="@color/verde_claro"
+            app:hintTextColor="@color/verde_claro">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etName"
@@ -38,8 +38,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Descripción"
-            app:boxStrokeColor="@color/green_primary"
-            app:hintTextColor="@color/green_primary">
+            app:boxStrokeColor="@color/verde_claro"
+            app:hintTextColor="@color/verde_claro">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDescription"
@@ -59,8 +59,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="Precio"
-            app:boxStrokeColor="@color/green_primary"
-            app:hintTextColor="@color/green_primary">
+            app:boxStrokeColor="@color/verde_claro"
+            app:hintTextColor="@color/verde_claro">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPrice"
@@ -79,8 +79,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Seleccionar Imagen"
-            android:textColor="@color/green_primary"
-            app:strokeColor="@color/green_primary"/>
+            android:textColor="@color/verde_claro"
+            app:strokeColor="@color/verde_claro"/>
 
         <!-- RecyclerView para vista previa de imágenes -->
         <androidx.recyclerview.widget.RecyclerView
@@ -102,7 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Crear Producto"
-            android:backgroundTint="@color/green_primary"
+            android:backgroundTint="@color/verde_claro"
             android:textColor="@color/white"/>
 
         <!-- Barra de Progreso -->
