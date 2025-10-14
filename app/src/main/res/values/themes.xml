@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!--
-      Tema principal de la app basado en Material3 sin ActionBar.
-      En apps reales se puede refinar paleta, tipografía y formas.
-    -->
-    <style name="Theme.XanoStoreKotlin" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/md_theme_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
-        <item name="android:statusBarColor" tools:targetApi="l">@color/md_theme_primary</item>
-        <item name="android:navigationBarColor" tools:targetApi="l">@color/md_theme_background</item>
+
+    <!-- Tema principal de la app -->
+    <!-- Se cambió el nombre de 'Theme.GreenBunny' a 'Theme.XanoStoreKotlin' para que coincida con AndroidManifest.xml -->
+    <style name="Theme.XanoStoreKotlin" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Colores -->
+        <item name="colorPrimary">@color/verde_claro</item>
+        <item name="colorOnPrimary">@color/blanco</item>
+        <item name="colorSecondary">@color/rosa_pastel</item>
+        <item name="colorOnSecondary">@color/blanco</item>
+        <item name="colorSurface">@color/blanco</item>
+        <item name="colorOnSurface">@color/gris_texto</item>
+        <item name="colorError">#B00020</item>
+        <item name="colorOnError">@color/blanco</item>
+
+        <!-- Fondo blanco -->
+        <item name="android:windowBackground">@color/blanco</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
+
 </resources>
