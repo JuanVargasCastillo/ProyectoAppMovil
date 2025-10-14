@@ -1,79 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Usamos un CoordinatorLayout para futuras interacciones como un botón flotante -->
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.ProductDetailActivity">
+    android:orientation="vertical"
+    android:background="#F8F8F8"
+    android:padding="16dp">
 
-    <!-- Usamos un ScrollView para que el contenido pueda desplazarse si es muy largo -->
-    <ScrollView
+    <!-- Carrusel de imágenes -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/imageViewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="250dp"
+        android:layout_marginBottom="16dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:overScrollMode="never"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+    <!-- Nombre -->
+    <TextView
+        android:id="@+id/tvProductName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nombre:"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="8dp"/>
 
-            <!-- 1. ViewPager2 para el carrusel de imágenes -->
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/image_view_pager"
-                android:layout_width="0dp"
-                android:layout_height="300dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+    <!-- Precio -->
+    <TextView
+        android:id="@+id/tvProductPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Precio:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/verde_claro"
+        android:layout_marginBottom="8dp"/>
 
-            <!-- 2. Título del producto -->
-            <TextView
-                android:id="@+id/tv_product_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/image_view_pager"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:text="Nombre del Producto Muy Largo" />
+    <!-- Descripción -->
+    <TextView
+        android:id="@+id/tvProductDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Descripción:"
+        android:textSize="16sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="8dp"/>
 
-            <!-- 3. Precio del producto -->
-            <TextView
-                android:id="@+id/tv_product_price"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAppearance="@style/TextAppearance.Material3.TitleLarge"
-                android:textColor="?attr/colorPrimary"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_product_name"
-                tools:text="Precio: 999.99" />
+    <!-- Stock -->
+    <TextView
+        android:id="@+id/tvProductStock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stock:"
+        android:textSize="16sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="20dp"/>
 
-            <!-- 4. Stock del producto -->
-            <TextView
-                android:id="@+id/tv_product_stock"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="@id/tv_product_price"
-                app:layout_constraintBottom_toBottomOf="@id/tv_product_price"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:text="Stock: 25"/>
+    <!-- Botón volver (por si no quieres depender solo de la ActionBar) -->
+    <Button
+        android:id="@+id/btnVolver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver"
+        android:backgroundTint="@color/rosa_claro"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="8dp"
+        android:onClick="onBackPressed"/>
 
-            <!-- 5. Descripción del producto -->
-            <TextView
-                android:id="@+id/tv_product_description"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                app:layout_constraintTop_toBottomOf="@id/tv_product_price"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:text="Esta es una descripción muy detallada del producto que puede ocupar varias líneas de texto para explicar todas sus características y beneficios." />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
