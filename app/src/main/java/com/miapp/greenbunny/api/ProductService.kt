@@ -1,22 +1,23 @@
-package com.miapp.greenbunny.api // Paquete del servicio de productos
+package com.miapp.greenbunny.api
 
-import com.miapp.greenbunny.model.CreateProductRequest // Import del modelo de request para crear producto
-import com.miapp.greenbunny.model.CreateProductResponse // Import del modelo de respuesta de creación
-import com.miapp.greenbunny.model.Product // Import del modelo de producto
-import retrofit2.http.Body // Import de anotación para el cuerpo de la solicitud
-import retrofit2.http.GET // Import de anotación para métodoo HTTP GET
-import retrofit2.http.POST // Import de anotación para métodoo HTTP POST
+import com.miapp.greenbunny.model.CreateProductRequest
+import com.miapp.greenbunny.model.CreateProductResponse
+import com.miapp.greenbunny.model.Product
+import com.miapp.greenbunny.model.ProductImage
+import retrofit2.http.*
 
-/**
- * ProductService
- * Endpoints de productos: listar y crear.
- * Base URL usada: ApiConfig.storeBaseUrl
- * Todas las líneas comentadas para explicar cada elemento.
- */
-interface ProductService { // Declaramos interfaz de Retrofit para productos
-    @GET("product") // Definimos endpoint GET /products
-    suspend fun getProducts(): List<Product> // Métodoo suspend que devuelve lista de productos
+interface ProductService {
 
-    @POST("product") // Definimos endpoint POST /products
-    suspend fun createProduct(@Body request: CreateProductRequest): CreateProductResponse // Métodoo suspend para crear producto, con cuerpo JSON
+    @GET("product")
+    suspend fun getProducts(): List<Product>
+
+    @POST("product")
+    suspend fun createProduct(@Body request: CreateProductRequest): CreateProductResponse
+
+    // PATCH para actualizar imágenes del producto
+    @PATCH("product/{id}")
+    suspend fun updateProductImages(
+        @Path("id") productId: Int,
+        @Body images: Map<String, List<ProductImage>>
+    ): Product
 }

@@ -27,13 +27,16 @@ class ProductAdapter(private var products: List<Product> = emptyList()) :
         holder.binding.tvDescription.text = product.description ?: ""
         holder.binding.tvPrice.text = product.price?.let { "Precio: $it" } ?: ""
 
-        // Mostrar la primera imagen disponible
-        product.images?.firstOrNull()?.url?.let {
-            holder.binding.imgProduct.load(it) {
+        // Mostrar la primera imagen disponible de la lista images
+        val imageUrl = product.images?.firstOrNull()?.url
+        if (imageUrl != null) {
+            holder.binding.imgProduct.load(imageUrl) {
                 placeholder(android.R.drawable.ic_menu_gallery)
                 error(android.R.drawable.ic_dialog_alert)
             }
-        } ?: holder.binding.imgProduct.setImageResource(android.R.drawable.ic_menu_gallery)
+        } else {
+            holder.binding.imgProduct.setImageResource(android.R.drawable.ic_menu_gallery)
+        }
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, ProductDetailActivity::class.java)

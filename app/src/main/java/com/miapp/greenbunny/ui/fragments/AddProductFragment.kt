@@ -1,12 +1,12 @@
 package com.miapp.greenbunny.ui.fragments
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,115 +16,117 @@ import com.miapp.greenbunny.model.CreateProductRequest
 import com.miapp.greenbunny.model.ProductImage
 import com.miapp.greenbunny.ui.adapter.ImagePreviewAdapter
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 
 class AddProductFragment : Fragment() {
 
     private var _binding: FragmentAddProductBinding? = null
     private val binding get() = _binding!!
 
-    private val selectedImageUris = mutableListOf<Uri>()
-    private lateinit var imagePreviewAdapter: ImagePreviewAdapter
+    private val selectedImages = mutableListOf<Uri>()
+    private lateinit var previewAdapter: ImagePreviewAdapter
 
-    private val pickImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
-        if (uris.isNotEmpty()) {
-            selectedImageUris.clear()
-            selectedImageUris.addAll(uris)
-            imagePreviewAdapter.notifyDataSetChanged()
-            binding.rvImagePreview.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentAddProductBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupRecyclerView()
 
-        binding.btnSelectImage.setOnClickListener { pickImages.launch("image/*") }
-        binding.btnSubmit.setOnClickListener { submit() }
+        binding.btnSelectImage.setOnClickListener { selectImages() }
+
+        binding.btnSubmit.setOnClickListener {
+            createProduct()
+        }
     }
 
     private fun setupRecyclerView() {
-        imagePreviewAdapter = ImagePreviewAdapter(selectedImageUris)
-        binding.rvImagePreview.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        binding.rvImagePreview.adapter = imagePreviewAdapter
+        previewAdapter = ImagePreviewAdapter(selectedImages)
+        binding.rvImagePreview.apply {
+            adapter = previewAdapter
+            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            visibility = View.GONE
+        }
     }
 
-    private fun submit() {
-        val name = binding.etName.text?.toString()?.trim().orEmpty()
-        val description = binding.etDescription.text?.toString()?.trim()
-        val price = binding.etPrice.text?.toString()?.trim()?.toIntOrNull()
+    private fun selectImages() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "image/*"
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        startActivityForResult(Intent.createChooser(intent, "Selecciona imágenes"), 100)
+    }
 
-        if (name.isBlank()) {
-            Toast.makeText(requireContext(), "El nombre es obligatorio", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        binding.progress.visibility = View.VISIBLE
-        binding.btnSubmit.isEnabled = false
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val uploadedImages = mutableListOf<ProductImage>()
-                if (selectedImageUris.isNotEmpty()) {
-                    val uploadTasks = selectedImageUris.map { uri ->
-                        async(Dispatchers.IO) { uploadImage(uri) }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
+            data?.let {
+                selectedImages.clear()
+                // Varias imágenes seleccionadas
+                if (it.clipData != null) {
+                    for (i in 0 until it.clipData!!.itemCount) {
+                        selectedImages.add(it.clipData!!.getItemAt(i).uri)
                     }
-                    val results = uploadTasks.awaitAll()
-                    uploadedImages.addAll(results.filterNotNull())
+                } else if (it.data != null) {
+                    selectedImages.add(it.data!!)
                 }
 
-                val service = RetrofitClient.createProductService(requireContext())
-                val req = CreateProductRequest(name, description, price, if (uploadedImages.isNotEmpty()) uploadedImages else null)
-                val resp = withContext(Dispatchers.IO) { service.createProduct(req) }
-
-                if (resp != null) {
-                    Toast.makeText(requireContext(), "Producto creado exitosamente", Toast.LENGTH_SHORT).show()
-                    clearForm()
-                } else {
-                    Toast.makeText(requireContext(), "Error: No se recibió confirmación", Toast.LENGTH_LONG).show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
-            } finally {
-                binding.progress.visibility = View.GONE
-                binding.btnSubmit.isEnabled = true
+                binding.rvImagePreview.visibility = if (selectedImages.isNotEmpty()) View.VISIBLE else View.GONE
+                previewAdapter.notifyDataSetChanged()
             }
         }
     }
 
-    private suspend fun uploadImage(uri: Uri): ProductImage? = withContext(Dispatchers.IO) {
-        try {
-            val bytes = requireContext().contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                ?: throw IOException("No se pudo abrir la URI: $uri")
-            val requestBody = bytes.toRequestBody(requireContext().contentResolver.getType(uri)?.toMediaTypeOrNull())
-            val part = MultipartBody.Part.createFormData("content", "image.jpg", requestBody)
-            val uploadService = RetrofitClient.createUploadService(requireContext())
-            val imageList: List<ProductImage> = uploadService.uploadImage(part)
-            imageList.firstOrNull()
-        } catch (e: Exception) {
-            null
-        }
-    }
+    private fun createProduct() {
+        val name = binding.etName.text.toString().trim()
+        val description = binding.etDescription.text.toString().trim()
+        val price = binding.etPrice.text.toString().trim().toIntOrNull() ?: 0
 
-    private fun clearForm() {
-        binding.etName.text?.clear()
-        binding.etDescription.text?.clear()
-        binding.etPrice.text?.clear()
-        selectedImageUris.clear()
-        imagePreviewAdapter.notifyDataSetChanged()
-        binding.rvImagePreview.visibility = View.GONE
+        if (name.isEmpty()) return
+
+        binding.progress.visibility = View.VISIBLE
+
+        lifecycleScope.launch {
+            try {
+                // 1. Subir todas las imágenes
+                val uploadService = RetrofitClient.createUploadService(requireContext())
+                val uploadedImages = mutableListOf<ProductImage>()
+                for (uri in selectedImages) {
+                    val file = File(uri.path ?: continue)
+                    val requestBody = file.asRequestBody("image/*".toMediaType())
+                    val part = MultipartBody.Part.createFormData("content", file.name, requestBody)
+                    val uploaded = withContext(Dispatchers.IO) { uploadService.uploadImage(part) }
+                    uploadedImages.addAll(uploaded)
+                }
+
+                // 2. Crear el producto
+                val productRequest = CreateProductRequest(
+                    name = name,
+                    description = description,
+                    price = price,
+                    images = uploadedImages
+                )
+                val productService = RetrofitClient.createProductService(requireContext())
+                val response = withContext(Dispatchers.IO) { productService.createProduct(productRequest) }
+
+                binding.progress.visibility = View.GONE
+                // Mostrar feedback / cerrar fragmento
+            } catch (e: Exception) {
+                binding.progress.visibility = View.GONE
+                e.printStackTrace()
+                // Mostrar error
+            }
+        }
     }
 
     override fun onDestroyView() {

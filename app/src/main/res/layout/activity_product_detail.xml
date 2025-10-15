@@ -7,15 +7,12 @@
     android:background="#F8F8F8"
     android:padding="16dp">
 
-    <!-- Imagen del producto -->
-    <ImageView
-        android:id="@+id/imgProduct"
+    <!-- Carrusel de imágenes -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpProductImages"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="Imagen del producto"
-        android:src="@android:drawable/ic_menu_gallery"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp" />
 
     <!-- Nombre -->
     <TextView

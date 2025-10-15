@@ -4,9 +4,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import coil.load
 import com.miapp.greenbunny.databinding.ActivityProductDetailBinding
 import com.miapp.greenbunny.model.Product
+import com.miapp.greenbunny.ui.adapter.ImageSliderAdapter
 
 class ProductDetailActivity : AppCompatActivity() {
 
@@ -36,14 +36,12 @@ class ProductDetailActivity : AppCompatActivity() {
         binding.tvProductName.text = "Nombre: ${product.name}"
         binding.tvProductPrice.text = product.price?.let { "Precio: $it" } ?: "Precio no disponible"
         binding.tvProductDescription.text = "Descripción: ${product.description ?: "Sin descripción"}"
-        binding.tvProductStock.text = "Stock: ${product.stock ?: "No especificado"}"
+        binding.tvProductStock.text = "Stock: ${product.stock}"
 
-        // Mostrar la primera imagen del producto
-        product.images?.firstOrNull()?.url?.let {
-            binding.imgProduct.load(it) {
-                placeholder(android.R.drawable.ic_menu_gallery)
-                error(android.R.drawable.ic_dialog_alert)
-            }
+        // Configurar carrusel de imágenes
+        product.images?.let { images ->
+            val adapter = ImageSliderAdapter(images)
+            binding.vpProductImages.adapter = adapter
         }
     }
 
