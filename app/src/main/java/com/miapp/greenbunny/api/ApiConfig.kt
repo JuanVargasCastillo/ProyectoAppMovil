@@ -15,3 +15,4 @@ object ApiConfig { // Objeto singleton con configuración básica de API
     val authBaseUrl: String = BuildConfig.XANO_AUTH_BASE // URL base para endpoints de autenticación
     val tokenTtlSec: Int = BuildConfig.XANO_TOKEN_TTL_SEC // Tiempo de vida de token (segundos) opcional
 }
+

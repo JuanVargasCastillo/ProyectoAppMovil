@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -72,7 +73,6 @@ class AddProductFragment : Fragment() {
         if (requestCode == 100 && resultCode == Activity.RESULT_OK) {
             data?.let {
                 selectedImages.clear()
-                // Varias imágenes seleccionadas
                 if (it.clipData != null) {
                     for (i in 0 until it.clipData!!.itemCount) {
                         selectedImages.add(it.clipData!!.getItemAt(i).uri)
@@ -80,7 +80,6 @@ class AddProductFragment : Fragment() {
                 } else if (it.data != null) {
                     selectedImages.add(it.data!!)
                 }
-
                 binding.rvImagePreview.visibility = if (selectedImages.isNotEmpty()) View.VISIBLE else View.GONE
                 previewAdapter.notifyDataSetChanged()
             }
@@ -92,24 +91,29 @@ class AddProductFragment : Fragment() {
         val description = binding.etDescription.text.toString().trim()
         val price = binding.etPrice.text.toString().trim().toIntOrNull() ?: 0
 
-        if (name.isEmpty()) return
+        if (name.isEmpty()) {
+            Toast.makeText(requireContext(), "El nombre es obligatorio", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         binding.progress.visibility = View.VISIBLE
 
         lifecycleScope.launch {
             try {
-                // 1. Subir todas las imágenes
-                val uploadService = RetrofitClient.createUploadService(requireContext())
+                // Subir imágenes
                 val uploadedImages = mutableListOf<ProductImage>()
-                for (uri in selectedImages) {
-                    val file = File(uri.path ?: continue)
-                    val requestBody = file.asRequestBody("image/*".toMediaType())
-                    val part = MultipartBody.Part.createFormData("content", file.name, requestBody)
-                    val uploaded = withContext(Dispatchers.IO) { uploadService.uploadImage(part) }
-                    uploadedImages.addAll(uploaded)
+                if (selectedImages.isNotEmpty()) {
+                    val uploadService = RetrofitClient.createUploadService(requireContext())
+                    for (uri in selectedImages) {
+                        val file = File(uri.path ?: continue)
+                        val requestBody = file.asRequestBody("image/*".toMediaType())
+                        val part = MultipartBody.Part.createFormData("content", file.name, requestBody)
+                        val uploaded = withContext(Dispatchers.IO) { uploadService.uploadImage(part) }
+                        uploadedImages.addAll(uploaded)
+                    }
                 }
 
-                // 2. Crear el producto
+                // Crear producto
                 val productRequest = CreateProductRequest(
                     name = name,
                     description = description,
@@ -117,14 +121,23 @@ class AddProductFragment : Fragment() {
                     images = uploadedImages
                 )
                 val productService = RetrofitClient.createProductService(requireContext())
-                val response = withContext(Dispatchers.IO) { productService.createProduct(productRequest) }
+                withContext(Dispatchers.IO) { productService.createProduct(productRequest) }
 
                 binding.progress.visibility = View.GONE
-                // Mostrar feedback / cerrar fragmento
+                Toast.makeText(requireContext(), "Producto creado correctamente", Toast.LENGTH_SHORT).show()
+
+                // Limpiar campos y preview
+                binding.etName.setText("")
+                binding.etDescription.setText("")
+                binding.etPrice.setText("")
+                selectedImages.clear()
+                previewAdapter.notifyDataSetChanged()
+                binding.rvImagePreview.visibility = View.GONE
+
             } catch (e: Exception) {
                 binding.progress.visibility = View.GONE
                 e.printStackTrace()
-                // Mostrar error
+                Toast.makeText(requireContext(), "Error al crear producto", Toast.LENGTH_SHORT).show()
             }
         }
     }
