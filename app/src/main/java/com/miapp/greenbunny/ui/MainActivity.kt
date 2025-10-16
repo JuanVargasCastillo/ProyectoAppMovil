@@ -3,7 +3,6 @@ package com.miapp.greenbunny.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,8 +14,17 @@ import com.miapp.greenbunny.model.LoginRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.regex.Pattern
 
+/**
+ * MainActivity (Login)
+ *
+ * Flujo:
+ * 1. Login con email y password (servicio público).
+ * 2. Guardado temporal del token.
+ * 3. Obtener datos de usuario con servicio privado (/auth/me).
+ * 4. Guardar token y usuario en TokenManager.
+ * 5. Ir a HomeActivity.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -29,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         tokenManager = TokenManager(this)
 
-        // Si ya hay sesión activa, vamos directo a Home
+        // Si ya hay sesión, ir directo a Home
         if (tokenManager.isLoggedIn()) {
             goToHome()
             return
@@ -39,66 +47,50 @@ class MainActivity : AppCompatActivity() {
             val email = binding.etEmail.text?.toString()?.trim().orEmpty()
             val password = binding.etPassword.text?.toString()?.trim().orEmpty()
 
-            // --- VALIDACIONES EN LA APP ---
             if (email.isBlank() || password.isBlank()) {
-                Toast.makeText(this, "Completa email y contraseña", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Completa email y password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (!isValidEmail(email)) {
-                Toast.makeText(this, "Correo inválido. Debe tener formato usuario@dominio.com", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (!isValidPassword(password)) {
-                Toast.makeText(
-                    this,
-                    "Contraseña inválida: mínimo 8 caracteres, 1 mayúscula, 1 número y 1 carácter especial",
-                    Toast.LENGTH_LONG
-                ).show()
-                return@setOnClickListener
-            }
-
-            // --- MOSTRAR PROGRESO ---
             binding.progress.visibility = View.VISIBLE
             binding.btnLogin.isEnabled = false
 
-            // --- LLAMADA AL BACKEND ---
             lifecycleScope.launch {
                 try {
-                    val publicAuthService = RetrofitClient.createAuthService(this@MainActivity)
+                    // 1️⃣ Login público
                     val loginResponse = withContext(Dispatchers.IO) {
-                        publicAuthService.login(LoginRequest(email = email, password = password))
+                        RetrofitClient.createAuthService(this@MainActivity, requiresAuth = false)
+                            .login(LoginRequest(email, password))
                     }
 
-                    val authToken = loginResponse.token   // ✅ cambio aquí
-                    val userProfile = loginResponse.user  // ✅ cambio aquí
+                    val authToken = loginResponse.authToken
 
-                    // Guardar token temporalmente
+                    // 2️⃣ Guardado temporal en SharedPreferences
                     getSharedPreferences("session", Context.MODE_PRIVATE).edit().apply {
                         putString("jwt_token", authToken)
                         apply()
                     }
 
-                    // Guardar usuario en TokenManager
+                    // 3️⃣ Servicio privado con token
+                    val privateAuthService = RetrofitClient.createAuthService(this@MainActivity, requiresAuth = true)
+                    val userProfile = withContext(Dispatchers.IO) {
+                        privateAuthService.getMe()
+                    }
+
+                    // 4️⃣ Guardar token + usuario formalmente
                     tokenManager.saveAuth(
                         token = authToken,
                         userName = userProfile.name,
                         userEmail = userProfile.email
                     )
 
-                    Toast.makeText(
-                        this@MainActivity,
-                        "¡Bienvenido, ${userProfile.name}! 🎉",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
+                    // 5️⃣ Bienvenida y navegación
+                    Toast.makeText(this@MainActivity, "¡Bienvenido, ${userProfile.name}!", Toast.LENGTH_SHORT).show()
                     goToHome()
 
                 } catch (e: Exception) {
-                    Log.e("MainActivity", "Login error", e)
-                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                     tokenManager.clear()
+                    Toast.makeText(this@MainActivity, "Error al iniciar sesión: ${e.message}", Toast.LENGTH_LONG).show()
                 } finally {
                     binding.progress.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
@@ -108,24 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, HomeActivity::class.java))
         finish()
-    }
-
-    // --- FUNCIONES DE VALIDACIÓN ---
-    private fun isValidEmail(email: String): Boolean {
-        val emailPattern = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
-        return emailPattern.matches(email)
-    }
-
-    private fun isValidPassword(password: String): Boolean {
-        if (password.length < 8) return false
-        val uppercase = Pattern.compile("[A-Z]")
-        val number = Pattern.compile("[0-9]")
-        val special = Pattern.compile("[^A-Za-z0-9]")
-        return uppercase.matcher(password).find() &&
-                number.matcher(password).find() &&
-                special.matcher(password).find()
     }
 }
