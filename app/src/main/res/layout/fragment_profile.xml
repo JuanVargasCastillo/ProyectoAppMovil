@@ -1,48 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/white">
+    android:padding="24dp">
 
+    <!-- Ícono del perfil -->
     <ImageView
-        android:id="@+id/ivProfile"
-        android:layout_width="122dp"
-        android:layout_height="122dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_profile_placeholder" />
+        android:id="@+id/imgProfile"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/perfil"
+        android:contentDescription="Imagen de perfil"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Nombre -->
     <TextView
         android:id="@+id/tvName"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:text="Nombre del usuario"
+        android:textSize="20sp"
         android:textStyle="bold"
-        android:text="Nombre: "
-        android:textColor="@color/black" />
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/imgProfile"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Email -->
     <TextView
         android:id="@+id/tvEmail"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:text="Correo electrónico"
+        android:textSize="16sp"
+        android:textColor="#666"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvName"
         android:layout_marginTop="8dp"
-        android:text="Email: "
-        android:textColor="@color/black" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Línea divisoria -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="200dp"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        app:layout_constraintTop_toBottomOf="@id/tvEmail"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Botón de logout -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogout"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/btn_logout_selector"
-        android:clickable="true"
-        android:stateListAnimator="@null"
         android:text="Cerrar sesión"
-        android:textColor="@color/black"
-        app:cornerRadius="16dp" />
+        android:textAllCaps="false"
+        android:layout_marginTop="32dp"
+        app:cornerRadius="12dp"
+        app:layout_constraintTop_toBottomOf="@id/divider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
