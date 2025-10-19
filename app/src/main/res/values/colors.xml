@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Tu paleta -->
-    <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
-    <color name="verde_claro">#bfd64f</color>      <!-- Verde claro -->
-    <color name="rosa_pastel">#fdbfd3</color>       <!-- Rosa pastel -->
-    <color name="rosa_claro">#ffd8e7</color>        <!-- Rosa claro -->
-
-    <!-- Paleta de tu pareja / extras -->
-    <color name="verde_secundario">#bfd64f</color>
+    <!-- Paleta principal -->
+    <color name="verde_claro">#bfd64f</color>
+    <color name="rosa_pastel">#fdbfd3</color>
+    <color name="rosa_claro">#ffd8e7</color>
     <color name="blanco">#FFFFFF</color>
     <color name="gris_texto">#555555</color>
+    <color name="white">#FFFFFF</color>
+    <color name="pink_pastel">#fdbfd3</color>
 
-    <!-- Colores Material3 -->
+
+    <!-- Colores Material3 / default -->
     <color name="md_theme_primary">#6750A4</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
     <color name="md_theme_background">#FFFFFF</color>
     <color name="md_theme_onBackground">#1C1B1F</color>
+
+    <!-- Colores estándar -->
+    <color name="black">#000000</color>
+
+    <!-- NOTA: btn_logout_selector ya no se declara aquí como color plano -->
+    <!-- Ahora debe estar en res/color/btn_logout_selector.xml como selector -->
 </resources>
