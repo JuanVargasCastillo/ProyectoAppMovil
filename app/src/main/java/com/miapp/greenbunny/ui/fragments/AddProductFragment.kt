@@ -73,6 +73,7 @@ class AddProductFragment : Fragment() {
         val name = binding.etName.text?.toString()?.trim().orEmpty()
         val description = binding.etDescription.text?.toString()?.trim()
         val price = binding.etPrice.text?.toString()?.trim()?.toIntOrNull()
+        val stock = binding.etStock.text?.toString()?.trim()?.toIntOrNull() ?: 0  // <-- stock leído
 
         if (name.isBlank()) {
             Toast.makeText(requireContext(), "El nombre es obligatorio", Toast.LENGTH_SHORT).show()
@@ -96,19 +97,19 @@ class AddProductFragment : Fragment() {
 
                     val results = uploadTasks.awaitAll()
                     results.filterNotNull().forEach { img ->
-                        // Agregar URL completa
                         uploadedImages.add(img.copy(url = "https://x8ki-letl-twmt.n7.xano.io${img.path}"))
                     }
 
                     Log.d("AddProductFragment", "Subida completada: ${uploadedImages.size} imágenes.")
                 }
 
-                // Crear producto
+                // Crear producto con stock incluido
                 val service = RetrofitClient.createProductService(requireContext())
                 val productRequest = CreateProductRequest(
                     name = name,
                     description = description,
                     price = price,
+                    stock = stock,                                  // <-- stock agregado
                     images = if (uploadedImages.isNotEmpty()) uploadedImages else null
                 )
 
@@ -150,6 +151,7 @@ class AddProductFragment : Fragment() {
         binding.etName.text?.clear()
         binding.etDescription.text?.clear()
         binding.etPrice.text?.clear()
+        binding.etStock.text?.clear()      // <-- limpiar stock
         selectedImageUris.clear()
         imagePreviewAdapter.notifyDataSetChanged()
         binding.rvImagePreview.visibility = View.GONE
