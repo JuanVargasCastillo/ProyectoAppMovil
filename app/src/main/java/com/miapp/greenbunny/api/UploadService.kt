@@ -6,6 +6,10 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
+/**
+ * Servicio de subida de imágenes.
+ * Devuelve siempre una lista de ProductImage, aunque subas solo una.
+ */
 interface UploadService {
 
     @Multipart
