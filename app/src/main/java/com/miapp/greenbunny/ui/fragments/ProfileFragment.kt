@@ -48,7 +48,6 @@ class ProfileFragment : Fragment() {
         binding.tvEmail.text = "Email: ${userEmail ?: "No disponible"}"
 
         // Imagen de perfil (por defecto)
-        binding.ivProfile.setImageResource(R.drawable.ic_profile_placeholder)
 
         // Acción de cerrar sesión
         binding.btnLogout.setOnClickListener {
