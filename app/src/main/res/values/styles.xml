@@ -1,0 +1,13 @@
+<resources>
+    <!-- 🔍 Estilo del SearchView -->
+    <style name="SearchViewTheme" parent="ThemeOverlay.AppCompat.Light">
+        <!-- Texto ingresado -->
+        <item name="android:textColor">@android:color/black</item>
+        <!-- Texto del hint ("Buscar productos...") -->
+        <item name="android:textColorHint">@android:color/darker_gray</item>
+        <!-- Color de íconos (lupa, clear, etc.) -->
+        <item name="android:colorControlNormal">@android:color/black</item>
+        <!-- Color del cursor (si deseas visible) -->
+        <item name="android:textCursorDrawable">@null</item>
+    </style>
+</resources>

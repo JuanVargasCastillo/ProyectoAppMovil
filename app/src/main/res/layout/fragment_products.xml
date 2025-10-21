@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
     android:padding="8dp">
 
-    <!-- Barra de búsqueda -->
+    <!-- 🔍 SearchView personalizada -->
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Buscar productos"
+        android:layout_height="51dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/search_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:iconifiedByDefault="false"
-        android:backgroundTint="@color/verde_claro"
-        android:queryBackground="@color/rosa_claro"
-        android:textColor="@color/black"
-        android:textColorHint="@color/verde_claro"
-        />
+        android:imeOptions="actionSearch"
+        android:inputType="text"
+        android:padding="7dp"
+        android:queryHint="Buscar productos..."
+        android:textCursorDrawable="@null"
+        android:theme="@style/SearchViewTheme" />
 
-    <!-- RecyclerView de productos -->
+    <!-- 🛒 Lista de productos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerProducts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="8dp"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"/>
+        android:paddingBottom="8dp" />
 
 </LinearLayout>
