@@ -1,37 +1,35 @@
-package com.miapp.greenbunny.ui.adapter // Paquete donde residen los adaptadores
+package com.miapp.greenbunny.ui.adapter
 
-import android.net.Uri // Import para manejar las URIs de las imágenes
-import android.view.LayoutInflater // Import para inflar layouts XML
-import android.view.ViewGroup // Import del contenedor padre en una lista
-import androidx.recyclerview.widget.RecyclerView // Import de la clase base para adaptadores
-import coil.load // Extensión de la librería Coil para cargar imágenes fácilmente
-import com.miapp.greenbunny.databinding.ItemImagePreviewBinding // ViewBinding para el layout del item
+import android.net.Uri
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.miapp.greenbunny.databinding.ItemImagePreviewBinding
 
 /**
  * ImagePreviewAdapter
- * Adaptador simple para mostrar una lista de imágenes (desde URIs) en un RecyclerView.
- * Utilizado en AddProductFragment para previsualizar las imágenes seleccionadas por el usuario.
+ * Muestra imágenes por URI y permite eliminar con long press (callback opcional).
  */
-class ImagePreviewAdapter(private val uris: List<Uri>) : // El constructor recibe la lista de URIs
-    RecyclerView.Adapter<ImagePreviewAdapter.ViewHolder>() {
+class ImagePreviewAdapter(
+    private val uris: List<Uri>,
+    private val onRemove: ((Int) -> Unit)? = null
+) : RecyclerView.Adapter<ImagePreviewAdapter.ViewHolder>() {
 
-    // El ViewHolder contiene la referencia al layout inflado (a través de ViewBinding).
     inner class ViewHolder(val binding: ItemImagePreviewBinding) : RecyclerView.ViewHolder(binding.root)
 
-    // Se llama cuando el RecyclerView necesita un nuevo ViewHolder.
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // Infla el layout 'item_image_preview.xml' usando ViewBinding.
         val binding = ItemImagePreviewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        // Crea y devuelve la instancia del ViewHolder.
         return ViewHolder(binding)
     }
 
-    // Se llama para vincular los datos de una posición específica con un ViewHolder.
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        // Usa la librería Coil para cargar la imagen desde la URI en el ImageView del item.
         holder.binding.ivPreviewItem.load(uris[position])
+        holder.binding.root.setOnLongClickListener {
+            onRemove?.invoke(position)
+            true
+        }
     }
 
-    // Devuelve la cantidad total de items en la lista.
     override fun getItemCount(): Int = uris.size
 }

@@ -8,6 +8,7 @@ import com.miapp.greenbunny.databinding.ActivityHomeBinding
 import com.miapp.greenbunny.ui.fragments.AddProductFragment
 import com.miapp.greenbunny.ui.fragments.ProductsFragment
 import com.miapp.greenbunny.ui.fragments.ProfileFragment
+import com.miapp.greenbunny.model.Product
 
 class HomeActivity : AppCompatActivity() {
 
@@ -24,8 +25,19 @@ class HomeActivity : AppCompatActivity() {
         // Mostramos saludo con el nombre del usuario
         binding.tvWelcome.text = "Hola ${tokenManager.getUserName()}!"
 
-        // Cargamos inicialmente Productos
-        replaceFragment(ProductsFragment())
+        // Si viene producto para editar, abrir AddProductFragment en modo EDIT
+        val productToEdit = intent.getSerializableExtra("PRODUCT_TO_EDIT") as? Product
+        if (productToEdit != null) {
+            val fragment = AddProductFragment().apply {
+                arguments = android.os.Bundle().apply {
+                    putSerializable("PRODUCT_TO_EDIT", productToEdit)
+                }
+            }
+            replaceFragment(fragment)
+        } else {
+            // Cargamos inicialmente Productos
+            replaceFragment(ProductsFragment())
+        }
 
         // Listener de BottomNavigation
         binding.bottomNav.setOnItemSelectedListener { item ->
