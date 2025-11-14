@@ -116,6 +116,30 @@
             tools:itemCount="3"
             tools:visibility="visible" />
 
+        <!-- Etiqueta imágenes existentes (solo en modo edición) -->
+        <TextView
+            android:id="@+id/tvExistingLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Imágenes actuales (mantén para eliminar)"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:visibility="gone"/>
+
+        <!-- RecyclerView para imágenes existentes en modo edición -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvExistingPreview"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_image_preview"
+            tools:itemCount="3"
+            tools:visibility="visible" />
+
         <!-- Botón de Enviar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmit"

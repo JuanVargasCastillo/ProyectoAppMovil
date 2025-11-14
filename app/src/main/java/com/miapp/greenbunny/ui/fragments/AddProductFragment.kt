@@ -9,10 +9,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.miapp.greenbunny.api.RetrofitClient
 import com.miapp.greenbunny.databinding.FragmentAddProductBinding
 import com.miapp.greenbunny.model.CreateProductRequest
+import com.miapp.greenbunny.model.Product
 import com.miapp.greenbunny.model.ProductImage
+import com.miapp.greenbunny.model.UpdateProductRequest
 import com.miapp.greenbunny.ui.adapter.ImagePreviewAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -29,15 +32,21 @@ class AddProductFragment : Fragment() {
     private var _binding: FragmentAddProductBinding? = null
     private val binding get() = _binding!!
 
-    private val selectedImageUris = mutableListOf<Uri>()
-    private lateinit var imagePreviewAdapter: ImagePreviewAdapter
+    private val newImageUris = mutableListOf<Uri>()
+    private lateinit var newImagesAdapter: ImagePreviewAdapter
+
+    // Modo edición
+    private var productToEdit: Product? = null
+    private val existingImages = mutableListOf<ProductImage>()
+    private val existingImageUris = mutableListOf<Uri>()
+    private lateinit var existingImagesAdapter: ImagePreviewAdapter
 
     private val pickImages =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetMultipleContents()) { uris ->
             if (uris.isNotEmpty()) {
-                selectedImageUris.clear()
-                selectedImageUris.addAll(uris)
-                imagePreviewAdapter.notifyDataSetChanged()
+                newImageUris.clear()
+                newImageUris.addAll(uris)
+                newImagesAdapter.notifyDataSetChanged()
                 binding.rvImagePreview.visibility = View.VISIBLE
             }
         }
@@ -62,11 +71,29 @@ class AddProductFragment : Fragment() {
         binding.btnSubmit.setOnClickListener {
             submit()
         }
+
+        // Leer producto para editar (si viene en argumentos)
+        productToEdit = arguments?.getSerializable("PRODUCT_TO_EDIT") as? Product
+        productToEdit?.let { setupEditMode(it) }
     }
 
     private fun setupRecyclerView() {
-        imagePreviewAdapter = ImagePreviewAdapter(selectedImageUris)
-        binding.rvImagePreview.adapter = imagePreviewAdapter
+        newImagesAdapter = ImagePreviewAdapter(newImageUris) { idx ->
+            newImageUris.removeAt(idx)
+            newImagesAdapter.notifyDataSetChanged()
+            if (newImageUris.isEmpty()) binding.rvImagePreview.visibility = View.GONE
+        }
+        binding.rvImagePreview.adapter = newImagesAdapter
+
+        existingImagesAdapter = ImagePreviewAdapter(existingImageUris) { idx ->
+            existingImageUris.removeAt(idx)
+            existingImages.removeAt(idx)
+            existingImagesAdapter.notifyDataSetChanged()
+            val hasExisting = existingImageUris.isNotEmpty()
+            binding.rvExistingPreview.visibility = if (hasExisting) View.VISIBLE else View.GONE
+            binding.tvExistingLabel.visibility = if (hasExisting) View.VISIBLE else View.GONE
+        }
+        binding.rvExistingPreview.adapter = existingImagesAdapter
     }
 
     private fun submit() {
@@ -87,11 +114,11 @@ class AddProductFragment : Fragment() {
             try {
                 // Subir imágenes una por una
                 val uploadedImages = mutableListOf<ProductImage>()
-                if (selectedImageUris.isNotEmpty()) {
-                    Log.d("AddProductFragment", "Subiendo ${selectedImageUris.size} imágenes...")
+                if (newImageUris.isNotEmpty()) {
+                    Log.d("AddProductFragment", "Subiendo ${newImageUris.size} imágenes...")
                     val uploadService = RetrofitClient.createUploadService(requireContext())
 
-                    val uploadTasks = selectedImageUris.map { uri ->
+                    val uploadTasks = newImageUris.map { uri ->
                         async(Dispatchers.IO) { uploadImage(uri, uploadService) }
                     }
 
@@ -102,22 +129,38 @@ class AddProductFragment : Fragment() {
 
                     Log.d("AddProductFragment", "Subida completada: ${uploadedImages.size} imágenes.")
                 }
-
-                // Crear producto con stock incluido
                 val service = RetrofitClient.createProductService(requireContext())
-                val productRequest = CreateProductRequest(
-                    name = name,
-                    description = description,
-                    price = price,
-                    stock = stock,                                  // <-- stock agregado
-                    images = if (uploadedImages.isNotEmpty()) uploadedImages else null
-                )
 
-                Log.d("AddProductFragment", "Creando producto: $productRequest")
-                withContext(Dispatchers.IO) { service.createProduct(productRequest) }
+                if (productToEdit == null) {
+                    // CREAR producto
+                    val productRequest = CreateProductRequest(
+                        name = name,
+                        description = description,
+                        price = price,
+                        stock = stock,
+                        images = if (uploadedImages.isNotEmpty()) uploadedImages else null
+                    )
+                    Log.d("AddProductFragment", "Creando producto: $productRequest")
+                    withContext(Dispatchers.IO) { service.createProduct(productRequest) }
+                    Toast.makeText(requireContext(), "Producto creado exitosamente", Toast.LENGTH_SHORT).show()
+                    clearForm()
+                } else {
+                    // EDITAR producto
+                    val imagesForUpdate = mutableListOf<ProductImage>()
+                    imagesForUpdate.addAll(existingImages) // preservamos las que quedaron
+                    imagesForUpdate.addAll(uploadedImages) // agregamos nuevas
 
-                Toast.makeText(requireContext(), "Producto creado exitosamente", Toast.LENGTH_SHORT).show()
-                clearForm()
+                    val updateRequest = UpdateProductRequest(
+                        name = name,
+                        description = description,
+                        price = price,
+                        stock = stock,
+                        images = imagesForUpdate.takeIf { it.isNotEmpty() }
+                    )
+                    Log.d("AddProductFragment", "Actualizando producto ${productToEdit?.id}: $updateRequest")
+                    withContext(Dispatchers.IO) { service.updateProduct(productToEdit!!.id, updateRequest) }
+                    Toast.makeText(requireContext(), "Producto actualizado", Toast.LENGTH_SHORT).show()
+                }
             } catch (e: Exception) {
                 Log.e("AddProductFragment", "Error al crear producto", e)
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
@@ -125,6 +168,32 @@ class AddProductFragment : Fragment() {
                 binding.progress.visibility = View.GONE
                 binding.btnSubmit.isEnabled = true
             }
+        }
+    }
+
+    private fun setupEditMode(product: Product) {
+        // Cambiar texto del botón
+        binding.btnSubmit.text = "Actualizar Producto"
+
+        // Prefill campos
+        binding.etName.setText(product.name)
+        binding.etDescription.setText(product.description ?: "")
+        binding.etPrice.setText(product.price?.toString() ?: "")
+        binding.etStock.setText(product.stock.toString())
+
+        // Cargar imágenes existentes
+        val imgs = product.images ?: emptyList()
+        existingImages.clear()
+        existingImages.addAll(imgs)
+        existingImageUris.clear()
+        imgs.forEach { img ->
+            val uri = Uri.parse(img.url ?: ("https://x8ki-letl-twmt.n7.xano.io" + img.path))
+            existingImageUris.add(uri)
+        }
+        if (existingImageUris.isNotEmpty()) {
+            binding.tvExistingLabel.visibility = View.VISIBLE
+            binding.rvExistingPreview.visibility = View.VISIBLE
+            existingImagesAdapter.notifyDataSetChanged()
         }
     }
 
@@ -152,8 +221,8 @@ class AddProductFragment : Fragment() {
         binding.etDescription.text?.clear()
         binding.etPrice.text?.clear()
         binding.etStock.text?.clear()      // <-- limpiar stock
-        selectedImageUris.clear()
-        imagePreviewAdapter.notifyDataSetChanged()
+        newImageUris.clear()
+        newImagesAdapter.notifyDataSetChanged()
         binding.rvImagePreview.visibility = View.GONE
     }
 
