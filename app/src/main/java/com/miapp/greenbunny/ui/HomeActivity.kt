@@ -3,11 +3,13 @@ package com.miapp.greenbunny.ui
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import android.widget.Toast
 import com.miapp.greenbunny.api.TokenManager
 import com.miapp.greenbunny.databinding.ActivityHomeBinding
 import com.miapp.greenbunny.ui.fragments.AddProductFragment
 import com.miapp.greenbunny.ui.fragments.ProductsFragment
 import com.miapp.greenbunny.ui.fragments.ProfileFragment
+import com.miapp.greenbunny.ui.fragments.UsersFragment
 import com.miapp.greenbunny.model.Product
 
 class HomeActivity : AppCompatActivity() {
@@ -24,6 +26,11 @@ class HomeActivity : AppCompatActivity() {
 
         // Mostramos saludo con el nombre del usuario
         binding.tvWelcome.text = "Hola ${tokenManager.getUserName()}!"
+
+        // Visibilidad de "Usuarios" basada en rol guardado en TokenManager
+        val role = tokenManager.getUserRole()
+        val isAdmin = role == "admin"
+        binding.bottomNav.menu.findItem(com.miapp.greenbunny.R.id.nav_users)?.isVisible = isAdmin
 
         // Si viene producto para editar, abrir AddProductFragment en modo EDIT
         val productToEdit = intent.getSerializableExtra("PRODUCT_TO_EDIT") as? Product
@@ -44,6 +51,7 @@ class HomeActivity : AppCompatActivity() {
             when (item.itemId) {
                 com.miapp.greenbunny.R.id.nav_products -> replaceFragment(ProductsFragment())
                 com.miapp.greenbunny.R.id.nav_add -> replaceFragment(AddProductFragment())
+                com.miapp.greenbunny.R.id.nav_users -> replaceFragment(UsersFragment())
                 com.miapp.greenbunny.R.id.nav_profile -> replaceFragment(ProfileFragment())
             }
             true

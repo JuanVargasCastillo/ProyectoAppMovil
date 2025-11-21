@@ -80,4 +80,13 @@ object RetrofitClient { // Objeto singleton que expone métodos de fábrica
             .build() // Construimos cliente
         return retrofit(storeBaseUrl, client).create(UploadService::class.java) // Reutilizamos storeBaseUrl para subida de archivos
     }
+
+    // NUEVO: Fábrica para UserService (usa Authorization)
+    fun createUserService(context: Context): UserService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(UserService::class.java)
+    }
 }

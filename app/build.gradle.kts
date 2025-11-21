@@ -55,7 +55,7 @@ dependencies { // Dependencias del módulo
     implementation(libs.androidx.constraintlayout) // Layout flexible para vistas
     implementation(libs.androidx.lifecycle.runtime.ktx) // Corrutinas y lifecycle integrados
     implementation(libs.androidx.activity.ktx) // Extensiones para Activities en Kotlin
-
+    implementation(libs.androidx.fragment.ktx)
     // Retrofit / OkHttp / Gson
     implementation(libs.retrofit) // Cliente HTTP de alto nivel
     implementation(libs.converter.gson) // Convertidor JSON usando Gson

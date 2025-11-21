@@ -81,7 +81,9 @@ class MainActivity : AppCompatActivity() {
                     tokenManager.saveAuth(
                         token = authToken,
                         userName = userProfile.name,
-                        userEmail = userProfile.email
+                        userEmail = userProfile.email,
+                        userRole = userProfile.role,
+                        userId = userProfile.id
                     )
 
                     // 5️⃣ Bienvenida y navegación
