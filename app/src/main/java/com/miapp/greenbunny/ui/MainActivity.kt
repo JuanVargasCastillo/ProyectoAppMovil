@@ -3,6 +3,7 @@ package com.miapp.greenbunny.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import com.miapp.greenbunny.api.RetrofitClient
 import com.miapp.greenbunny.api.TokenManager
 import com.miapp.greenbunny.databinding.ActivityMainBinding
 import com.miapp.greenbunny.model.LoginRequest
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,11 +79,15 @@ class MainActivity : AppCompatActivity() {
                         privateAuthService.getMe()
                     }
 
+                    // Logs de depuración del perfil recibido
+                    Log.d("MainActivity", "JSON /auth/me: ${Gson().toJson(userProfile)}")
+                    Log.d("MainActivity", "role antes de guardar: ${userProfile.role}")
+
                     // 4️⃣ Guardar token + usuario formalmente
                     tokenManager.saveAuth(
                         token = authToken,
-                        userName = userProfile.name,
-                        userEmail = userProfile.email,
+                        userName = userProfile.name ?: "",
+                        userEmail = userProfile.email ?: "",
                         userRole = userProfile.role,
                         userId = userProfile.id
                     )
