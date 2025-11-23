@@ -13,13 +13,13 @@ data class User(
     val id: Int,
 
     @SerializedName("name")
-    val name: String,
+    val name: String?,
 
     @SerializedName("last_name")
     val lastName: String? = null,
 
     @SerializedName("email")
-    val email: String,
+    val email: String?,
 
     @SerializedName("role")
     val role: String? = null,
@@ -35,5 +35,5 @@ data class User(
 
     // El campo "created_at" también se puede incluir si lo necesitas
     @SerializedName("created_at")
-    val createdAt: Long?
+    val createdAt: Long? = null
 ) : Serializable

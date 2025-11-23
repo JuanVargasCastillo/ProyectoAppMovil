@@ -1,16 +1,17 @@
 package com.miapp.greenbunny.ui
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import android.widget.Toast
 import com.miapp.greenbunny.api.TokenManager
 import com.miapp.greenbunny.databinding.ActivityHomeBinding
+import com.miapp.greenbunny.model.Product
 import com.miapp.greenbunny.ui.fragments.AddProductFragment
 import com.miapp.greenbunny.ui.fragments.ProductsFragment
 import com.miapp.greenbunny.ui.fragments.ProfileFragment
 import com.miapp.greenbunny.ui.fragments.UsersFragment
-import com.miapp.greenbunny.model.Product
 
 class HomeActivity : AppCompatActivity() {
 
@@ -24,41 +25,52 @@ class HomeActivity : AppCompatActivity() {
 
         tokenManager = TokenManager(this)
 
-        // Mostramos saludo con el nombre del usuario
+        // Saludo
         binding.tvWelcome.text = "Hola ${tokenManager.getUserName()}!"
 
-        // Visibilidad de "Usuarios" basada en rol guardado en TokenManager
+        // Rol actual
         val role = tokenManager.getUserRole()
-        val isAdmin = role == "admin"
-        binding.bottomNav.menu.findItem(com.miapp.greenbunny.R.id.nav_users)?.isVisible = isAdmin
+        Log.d("HomeActivity", "Role en sesión: $role")
+        Toast.makeText(this, "Role en sesión: $role", Toast.LENGTH_LONG).show()
 
-        // Si viene producto para editar, abrir AddProductFragment en modo EDIT
+
+        binding.bottomNav.menu.findItem(com.miapp.greenbunny.R.id.nav_users)?.isVisible = true
+
+
+
+        // Si venía un producto para editar → abrir AddProductFragment
         val productToEdit = intent.getSerializableExtra("PRODUCT_TO_EDIT") as? Product
         if (productToEdit != null) {
             val fragment = AddProductFragment().apply {
-                arguments = android.os.Bundle().apply {
+                arguments = Bundle().apply {
                     putSerializable("PRODUCT_TO_EDIT", productToEdit)
                 }
             }
             replaceFragment(fragment)
         } else {
-            // Cargamos inicialmente Productos
+            // Fragment inicial
             replaceFragment(ProductsFragment())
         }
 
-        // Listener de BottomNavigation
+        // Navegación inferior
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                com.miapp.greenbunny.R.id.nav_products -> replaceFragment(ProductsFragment())
-                com.miapp.greenbunny.R.id.nav_add -> replaceFragment(AddProductFragment())
-                com.miapp.greenbunny.R.id.nav_users -> replaceFragment(UsersFragment())
-                com.miapp.greenbunny.R.id.nav_profile -> replaceFragment(ProfileFragment())
+                com.miapp.greenbunny.R.id.nav_products ->
+                    replaceFragment(ProductsFragment())
+
+                com.miapp.greenbunny.R.id.nav_add ->
+                    replaceFragment(AddProductFragment())
+
+                com.miapp.greenbunny.R.id.nav_users ->
+                    replaceFragment(UsersFragment())
+
+                com.miapp.greenbunny.R.id.nav_profile ->
+                    replaceFragment(ProfileFragment())
             }
             true
         }
     }
 
-    // Función para reemplazar fragmentos
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(binding.fragmentContainer.id, fragment)

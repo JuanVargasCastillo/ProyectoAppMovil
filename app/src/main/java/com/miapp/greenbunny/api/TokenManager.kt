@@ -15,13 +15,12 @@ class TokenManager(context: Context) { // Clase que encapsula el acceso a Shared
     private val prefs: SharedPreferences =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    // ¡¡CAMBIO AQUÍ!!
-    // Esta variable contendrá el token en memoria durante el proceso de login.
+
     var currentToken: String? = null
-        private set // La hacemos de solo lectura desde fuera
+        private set
 
     init {
-        // Al iniciar, cargamos el token desde las preferencias
+
         currentToken = prefs.getString(KEY_TOKEN, null)
     }
 

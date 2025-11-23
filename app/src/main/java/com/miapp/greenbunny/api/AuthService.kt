@@ -5,7 +5,7 @@ import com.miapp.greenbunny.model.LoginRequest // Import del modelo de request d
 import com.miapp.greenbunny.model.User
 import retrofit2.http.Body // Import de anotación para cuerpo de la solicitud
 import retrofit2.http.GET
-import retrofit2.http.POST // Import de anotación para métodoo HTTP POST
+import retrofit2.http.POST // Import de anotación para método HTTP POST
 
 /**
  * AuthService
@@ -17,7 +17,11 @@ interface AuthService { // Interfaz de Retrofit para autenticación
     @POST("auth/login") // Endpoint POST /login
     suspend fun login(@Body request: LoginRequest): AuthResponse // Métodoo suspend que envía email/password y recibe token + user
 
+    // Signup
+    @POST("auth/signup")
+    suspend fun signup(@Body request: LoginRequest): AuthResponse
 
+    
     // ¡NUEVO! Endpoint para obtener datos del usuario autenticado
     @GET("auth/me")
     suspend fun getMe(): User // Devuelve directamente el objeto User

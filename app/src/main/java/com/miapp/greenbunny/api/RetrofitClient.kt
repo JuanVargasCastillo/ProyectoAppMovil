@@ -1,8 +1,8 @@
 package com.miapp.greenbunny.api // Paquete donde vive el cliente Retrofit
 
 import android.content.Context // Import para usar Context al construir interceptores dependientes de token
-import com.miapp.greenbunny.api.ApiConfig.authBaseUrl // Import del baseUrl de autenticación (definido en BuildConfig/ApiConfig)
-import com.miapp.greenbunny.api.ApiConfig.storeBaseUrl // Import del baseUrl de tienda/productos
+import com.miapp.greenbunny.api.ApiConfig.authBaseUrl // Base URL de autenticación (Xano)
+import com.miapp.greenbunny.api.ApiConfig.storeBaseUrl // Base URL de tienda/productos
 import okhttp3.OkHttpClient // Cliente HTTP subyacente usado por Retrofit
 import okhttp3.logging.HttpLoggingInterceptor // Interceptor de logging para depuración
 import retrofit2.Retrofit // Clase principal para construir el cliente Retrofit
@@ -13,80 +13,86 @@ import java.util.concurrent.TimeUnit // Utilidad para definir timeouts
  * RetrofitClient
  * Centraliza la creación de instancias de Retrofit y OkHttp.
  *
- * Se ha modificado para soportar el flujo de autenticación en dos pasos:
- * 1. Un servicio de autenticación PÚBLICO (para el login).
- * 2. Un servicio de autenticación PRIVADO (para /auth/me y otras llamadas que requieran token).
+ * Flujo soportado:
+ * 1. Servicios de autenticación (login público y /auth/me privado).
+ * 2. Servicios de productos (API de tienda).
+ * 3. Servicios de subida de archivos.
+ * 4. Servicios de usuarios (admin) sobre la API de autenticación.
  */
 object RetrofitClient { // Objeto singleton que expone métodos de fábrica
 
-    // Builder base de OkHttp configurado con logging y timeouts. No necesita cambios.
+    // Builder base de OkHttp configurado con logging y timeouts.
     private fun baseOkHttpBuilder(): OkHttpClient.Builder {
-        val logging = HttpLoggingInterceptor().apply { // Creamos el interceptor de logging
+        val logging = HttpLoggingInterceptor().apply {
             // Nivel BODY útil en desarrollo para ver requests y responses completas.
-            level = HttpLoggingInterceptor.Level.BODY // Establecemos el nivel de detalle
+            level = HttpLoggingInterceptor.Level.BODY
         }
-        return OkHttpClient.Builder() // Iniciamos el builder de OkHttp
-            .addInterceptor(logging) // Añadimos el interceptor de logging
-            .connectTimeout(30, TimeUnit.SECONDS) // Timeout de conexión
-            .readTimeout(30, TimeUnit.SECONDS) // Timeout de lectura
-            .writeTimeout(30, TimeUnit.SECONDS) // Timeout de escritura
+        return OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
     }
 
-    // Función que construye Retrofit con baseUrl y cliente. No necesita cambios.
+    // Construye Retrofit con baseUrl y cliente.
     private fun retrofit(baseUrl: String, client: OkHttpClient): Retrofit =
-        Retrofit.Builder() // Iniciamos builder de Retrofit
-            .baseUrl(baseUrl) // Establecemos base URL
-            .client(client) // Asociamos cliente OkHttp
-            .addConverterFactory(GsonConverterFactory.create()) // Añadimos convertidor Gson
-            .build() // Construimos instancia Retrofit
+        Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
     /**
-     * ¡FUNCIÓN MODIFICADA Y UNIFICADA!
-     * Fábrica para AuthService. Ahora acepta un parámetro 'requiresAuth'.
-     *
-     * @param context El contexto de la aplicación.
-     * @param requiresAuth Si es 'true', se creará un cliente con el interceptor de token.
-     *                     Si es 'false' (por defecto), se creará un cliente público sin token.
-     * @return Una instancia de AuthService.
+     * Fábrica para AuthService.
+     * @param requiresAuth Si es true, agrega interceptor de token (para /auth/me, etc.).
      */
     fun createAuthService(context: Context, requiresAuth: Boolean = false): AuthService {
-        val clientBuilder = baseOkHttpBuilder() // Partimos del builder base
+        val clientBuilder = baseOkHttpBuilder()
 
         if (requiresAuth) {
-            // Si se requiere autenticación, obtenemos el token y añadimos el interceptor
             val tokenManager = TokenManager(context)
             clientBuilder.addInterceptor(AuthInterceptor { tokenManager.getToken() })
         }
 
-        // Construimos el cliente OkHttp y luego la instancia de Retrofit
         val client = clientBuilder.build()
         return retrofit(authBaseUrl, client).create(AuthService::class.java)
     }
 
-    // Fábrica para ProductService (con Authorization). No necesita cambios.
+    /**
+     * Fábrica para ProductService (API de tienda).
+     */
     fun createProductService(context: Context): ProductService {
-        val tokenManager = TokenManager(context) // Acceso al TokenManager para obtener el token
-        val client = baseOkHttpBuilder() // Partimos del builder base
-            .addInterceptor(AuthInterceptor { tokenManager.getToken() }) // Añadimos nuestro interceptor que inserta Bearer token
-            .build() // Construimos cliente OkHttp
-        return retrofit(storeBaseUrl, client).create(ProductService::class.java) // Construimos Retrofit con base de tienda y generamos servicio
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(ProductService::class.java)
     }
 
-    // Fábrica para UploadService (usa Authorization). No necesita cambios.
+    /**
+     * Fábrica para UploadService (subida de archivos en API de tienda).
+     */
     fun createUploadService(context: Context): UploadService {
-        val tokenManager = TokenManager(context) // Obtenemos el token desde TokenManager
-        val client = baseOkHttpBuilder() // Builder base
-            .addInterceptor(AuthInterceptor { tokenManager.getToken() }) // Interceptor de Authorization
-            .build() // Construimos cliente
-        return retrofit(storeBaseUrl, client).create(UploadService::class.java) // Reutilizamos storeBaseUrl para subida de archivos
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(UploadService::class.java)
     }
 
-    // NUEVO: Fábrica para UserService (usa Authorization)
+    /**
+     * Fábrica para UserService (módulo Admin Usuarios).
+     *
+     * IMPORTANTE:
+     * - Usa authBaseUrl porque los endpoints /user, /user/{id}, /user/{id}/block, etc.
+     *   están definidos en la misma API donde viven /auth/login y /auth/me.
+     */
     fun createUserService(context: Context): UserService {
         val tokenManager = TokenManager(context)
         val client = baseOkHttpBuilder()
             .addInterceptor(AuthInterceptor { tokenManager.getToken() })
             .build()
-        return retrofit(storeBaseUrl, client).create(UserService::class.java)
+        // 👇 ANTES: storeBaseUrl → provocaba 404
+        return retrofit(authBaseUrl, client).create(UserService::class.java)
     }
 }
