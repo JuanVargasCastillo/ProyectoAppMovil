@@ -80,19 +80,5 @@ object RetrofitClient { // Objeto singleton que expone métodos de fábrica
         return retrofit(storeBaseUrl, client).create(UploadService::class.java)
     }
 
-    /**
-     * Fábrica para UserService (módulo Admin Usuarios).
-     *
-     * IMPORTANTE:
-     * - Usa authBaseUrl porque los endpoints /user, /user/{id}, /user/{id}/block, etc.
-     *   están definidos en la misma API donde viven /auth/login y /auth/me.
-     */
-    fun createUserService(context: Context): UserService {
-        val tokenManager = TokenManager(context)
-        val client = baseOkHttpBuilder()
-            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
-            .build()
-        // 👇 ANTES: storeBaseUrl → provocaba 404
-        return retrofit(authBaseUrl, client).create(UserService::class.java)
-    }
+    
 }

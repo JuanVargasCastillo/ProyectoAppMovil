@@ -204,7 +204,7 @@ class AddProductFragment : Fragment() {
                 val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
                     ?: throw IOException("No se pudo abrir el archivo: $uri")
                 val requestBody = bytes.toRequestBody(contentResolver.getType(uri)?.toMediaTypeOrNull())
-                val part = MultipartBody.Part.createFormData("content", "image.jpg", requestBody)
+                val part = MultipartBody.Part.createFormData("image", "image.jpg", requestBody)
 
                 val imageList = service.uploadImage(part)
                 val productImage = imageList.firstOrNull()

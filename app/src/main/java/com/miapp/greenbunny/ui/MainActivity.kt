@@ -67,11 +67,14 @@ class MainActivity : AppCompatActivity() {
 
                     val authToken = loginResponse.authToken
 
-                    // 2️⃣ Guardado temporal en SharedPreferences
-                    getSharedPreferences("session", Context.MODE_PRIVATE).edit().apply {
-                        putString("jwt_token", authToken)
-                        apply()
-                    }
+                    // 2️⃣ Guardado temporal usando TokenManager para habilitar el interceptor
+                    tokenManager.saveAuth(
+                        token = authToken,
+                        userName = "",
+                        userEmail = "",
+                        userRole = null,
+                        userId = null
+                    )
 
                     // 3️⃣ Servicio privado con token
                     val privateAuthService = RetrofitClient.createAuthService(this@MainActivity, requiresAuth = true)
