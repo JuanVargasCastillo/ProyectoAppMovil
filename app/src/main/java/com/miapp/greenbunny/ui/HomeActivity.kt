@@ -11,7 +11,6 @@ import com.miapp.greenbunny.model.Product
 import com.miapp.greenbunny.ui.fragments.AddProductFragment
 import com.miapp.greenbunny.ui.fragments.ProductsFragment
 import com.miapp.greenbunny.ui.fragments.ProfileFragment
-import com.miapp.greenbunny.ui.fragments.UsersFragment
 
 class HomeActivity : AppCompatActivity() {
 
@@ -34,7 +33,7 @@ class HomeActivity : AppCompatActivity() {
         Toast.makeText(this, "Role en sesión: $role", Toast.LENGTH_LONG).show()
 
 
-        binding.bottomNav.menu.findItem(com.miapp.greenbunny.R.id.nav_users)?.isVisible = true
+        binding.bottomNav.menu.findItem(com.miapp.greenbunny.R.id.nav_users)?.isVisible = role == "admin"
 
 
 
@@ -61,8 +60,9 @@ class HomeActivity : AppCompatActivity() {
                 com.miapp.greenbunny.R.id.nav_add ->
                     replaceFragment(AddProductFragment())
 
-                com.miapp.greenbunny.R.id.nav_users ->
-                    replaceFragment(UsersFragment())
+                com.miapp.greenbunny.R.id.nav_users -> {
+                    Toast.makeText(this, "Sección de usuarios no disponible", Toast.LENGTH_SHORT).show()
+                }
 
                 com.miapp.greenbunny.R.id.nav_profile ->
                     replaceFragment(ProfileFragment())
