@@ -2,6 +2,7 @@ package com.miapp.greenbunny.api // Paquete del servicio de autenticación
 
 import com.miapp.greenbunny.model.AuthResponse // Import del modelo de respuesta de login
 import com.miapp.greenbunny.model.LoginRequest // Import del modelo de request de login
+import com.miapp.greenbunny.model.CreateUserRequest
 import com.miapp.greenbunny.model.User
 import retrofit2.http.Body // Import de anotación para cuerpo de la solicitud
 import retrofit2.http.GET
@@ -20,6 +21,9 @@ interface AuthService { // Interfaz de Retrofit para autenticación
     // Signup
     @POST("auth/signup")
     suspend fun signup(@Body request: LoginRequest): AuthResponse
+
+    @POST("auth/signup")
+    suspend fun signup(@Body request: CreateUserRequest): AuthResponse
 
     
     // ¡NUEVO! Endpoint para obtener datos del usuario autenticado
