@@ -21,10 +21,10 @@ data class User(
     @SerializedName("email")
     val email: String?,
 
-    @SerializedName("role")
+    @SerializedName(value = "role", alternate = ["user_role"])
     val role: String? = null,
 
-    @SerializedName("status")
+    @SerializedName(value = "status", alternate = ["user_status"])
     val status: String? = null,
 
     @SerializedName("address")

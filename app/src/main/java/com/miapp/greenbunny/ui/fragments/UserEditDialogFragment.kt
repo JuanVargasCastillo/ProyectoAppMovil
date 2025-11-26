@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.miapp.greenbunny.api.RetrofitClient
@@ -29,7 +29,7 @@ class UserEditDialogFragment(
         setupSpinners()
         populate()
         setupActions()
-        return AlertDialog.Builder(requireContext())
+        return MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .create()
     }
@@ -115,4 +115,3 @@ class UserEditDialogFragment(
         _binding = null
     }
 }
-

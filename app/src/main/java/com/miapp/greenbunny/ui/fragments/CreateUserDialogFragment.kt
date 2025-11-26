@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.miapp.greenbunny.api.RetrofitClient
@@ -25,7 +25,7 @@ class CreateUserDialogFragment(private val onUserCreated: (() -> Unit)? = null) 
         setupSpinners()
         setupActions()
 
-        return AlertDialog.Builder(requireContext())
+        return MaterialAlertDialogBuilder(requireContext())
             .setView(binding.root)
             .create()
     }
@@ -105,4 +105,3 @@ class CreateUserDialogFragment(private val onUserCreated: (() -> Unit)? = null) 
         _binding = null
     }
 }
-
