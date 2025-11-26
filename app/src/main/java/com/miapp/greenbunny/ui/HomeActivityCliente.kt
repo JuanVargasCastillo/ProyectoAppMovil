@@ -31,7 +31,7 @@ class HomeActivityCliente : AppCompatActivity() {
                     replaceFragment(ProductsFragment())
 
                 com.miapp.greenbunny.R.id.nav_carrito -> {
-                    Toast.makeText(this, "Carrito próximamente", Toast.LENGTH_SHORT).show()
+                    replaceFragment(com.miapp.greenbunny.ui.fragments.CartFragment())
                 }
 
                 com.miapp.greenbunny.R.id.nav_profile ->
