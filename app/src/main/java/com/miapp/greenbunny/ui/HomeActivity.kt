@@ -55,6 +55,9 @@ class HomeActivityAdmin : AppCompatActivity() {
                 com.miapp.greenbunny.R.id.nav_users ->
                     replaceFragment(com.miapp.greenbunny.ui.fragments.UsersFragment())
 
+                com.miapp.greenbunny.R.id.nav_orders ->
+                    replaceFragment(com.miapp.greenbunny.ui.fragments.AdminOrdersFragment())
+
                 com.miapp.greenbunny.R.id.nav_profile ->
                     replaceFragment(ProfileFragment())
             }
