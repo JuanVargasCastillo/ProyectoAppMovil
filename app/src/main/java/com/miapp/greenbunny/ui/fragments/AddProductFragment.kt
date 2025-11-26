@@ -138,7 +138,7 @@ class AddProductFragment : Fragment() {
                         description = description,
                         price = price,
                         stock = stock,
-                        images = if (uploadedImages.isNotEmpty()) uploadedImages else null
+                        images = uploadedImages
                     )
                     Log.d("AddProductFragment", "Creando producto: $productRequest")
                     withContext(Dispatchers.IO) { service.createProduct(productRequest) }
@@ -155,7 +155,7 @@ class AddProductFragment : Fragment() {
                         description = description,
                         price = price,
                         stock = stock,
-                        images = imagesForUpdate.takeIf { it.isNotEmpty() }
+                        images = imagesForUpdate
                     )
                     Log.d("AddProductFragment", "Actualizando producto ${productToEdit?.id}: $updateRequest")
                     withContext(Dispatchers.IO) { service.updateProduct(productToEdit!!.id, updateRequest) }
@@ -203,8 +203,11 @@ class AddProductFragment : Fragment() {
                 val contentResolver = requireContext().contentResolver
                 val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
                     ?: throw IOException("No se pudo abrir el archivo: $uri")
-                val requestBody = bytes.toRequestBody(contentResolver.getType(uri)?.toMediaTypeOrNull())
-                val part = MultipartBody.Part.createFormData("image", "image.jpg", requestBody)
+
+                val mimeType = contentResolver.getType(uri)?.toMediaTypeOrNull() ?: "image/*".toMediaTypeOrNull()
+                val fileName = queryDisplayName(uri) ?: "image.jpg"
+                val requestBody = bytes.toRequestBody(mimeType)
+                val part = MultipartBody.Part.createFormData("content", fileName, requestBody)
 
                 val imageList = service.uploadImage(part)
                 val productImage = imageList.firstOrNull()
@@ -215,6 +218,17 @@ class AddProductFragment : Fragment() {
                 null
             }
         }
+
+    private fun queryDisplayName(uri: Uri): String? {
+        return try {
+            val cr = requireContext().contentResolver
+            cr.query(uri, arrayOf(android.provider.MediaStore.MediaColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                if (c.moveToFirst()) c.getString(0) else null
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
 
     private fun clearForm() {
         binding.etName.text?.clear()
