@@ -88,5 +88,35 @@ object RetrofitClient { // Objeto singleton que expone métodos de fábrica
         return retrofit(authBaseUrl, client).create(UserService::class.java)
     }
 
-    
+    fun createCategoryService(context: Context): CategoryService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(CategoryService::class.java)
+    }
+
+    fun createOrderService(context: Context): OrderService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(OrderService::class.java)
+    }
+
+    fun createOrderProductService(context: Context): OrderProductService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(OrderProductService::class.java)
+    }
+
+    fun createShipmentService(context: Context): ShipmentService {
+        val tokenManager = TokenManager(context)
+        val client = baseOkHttpBuilder()
+            .addInterceptor(AuthInterceptor { tokenManager.getToken() })
+            .build()
+        return retrofit(storeBaseUrl, client).create(ShipmentService::class.java)
+    }
 }

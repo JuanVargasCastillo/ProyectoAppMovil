@@ -24,6 +24,27 @@ class ProductDetailClienteFragment : Fragment() {
         val product = arguments?.getSerializable("PRODUCT_EXTRA") as? Product ?: return
         displayProduct(product)
         binding.btnVolver.setOnClickListener { activity?.finish() }
+        binding.btnAddToCart.setOnClickListener {
+            val price = product.price
+            if (price == null || price <= 0) {
+                android.widget.Toast.makeText(requireContext(), "Precio no disponible", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (product.stock <= 0) {
+                android.widget.Toast.makeText(requireContext(), "Sin stock", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val cm = com.miapp.greenbunny.api.CartManager(requireContext())
+            val imageUrl = product.images?.firstOrNull()?.url
+            cm.addOrUpdate(product.id, product.name, price, 1, imageUrl)
+            android.widget.Toast.makeText(requireContext(), "Agregado al carrito", android.widget.Toast.LENGTH_SHORT).show()
+        }
+        binding.btnGoCart.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace((view.parent as ViewGroup).id, com.miapp.greenbunny.ui.fragments.CartFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
     private fun displayProduct(product: Product) {

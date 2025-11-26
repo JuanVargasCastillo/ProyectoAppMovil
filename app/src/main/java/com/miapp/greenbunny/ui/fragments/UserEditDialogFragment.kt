@@ -40,7 +40,7 @@ class UserEditDialogFragment(
         adapterRoles.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spRole.adapter = adapterRoles
 
-        val statuses = listOf("activo", "inactivo", "bloqueado")
+        val statuses = listOf("activo", "inactivo")
         val adapterStatus = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statuses)
         adapterStatus.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spStatus.adapter = adapterStatus
@@ -54,10 +54,10 @@ class UserEditDialogFragment(
         binding.etAddress.setText(user.address ?: "")
         binding.etPhone.setText(user.phone ?: "")
 
-        val roleIndex = listOf("admin", "user").indexOf(user.role ?: "user").let { if (it >= 0) it else 1 }
+        val roleIndex = listOf("admin", "user").indexOf(user.role?.lowercase() ?: "user").let { if (it >= 0) it else 1 }
         binding.spRole.setSelection(roleIndex)
 
-        val statusMap = listOf("activo", "inactivo", "bloqueado")
+        val statusMap = listOf("activo", "inactivo")
         val statusIndex = statusMap.indexOf(user.status?.lowercase() ?: "activo").let { if (it >= 0) it else 0 }
         binding.spStatus.setSelection(statusIndex)
     }
