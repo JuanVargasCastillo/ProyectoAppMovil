@@ -50,35 +50,24 @@ class CartFragment : Fragment() {
             binding.progress.visibility = View.VISIBLE
             lifecycleScope.launch {
                 try {
-                    // Validar precios actuales contra catálogo para evitar desfasajes
-                    val productService = com.miapp.greenbunny.api.RetrofitClient.createProductService(requireContext())
-                    val catalog = withContext(Dispatchers.IO) { productService.getProducts() }
-                    val updatedItems = items.map { ci ->
-                        val p = catalog.firstOrNull { it.id == ci.productId }
-                        val price = p?.price ?: ci.price
-                        CartItem(ci.productId, ci.name, price, ci.quantity, ci.imageUrl)
-                    }
-                    // Persistir precios actualizados
-                    updatedItems.forEach {
-                        val existingQty = cartManager.getItems().firstOrNull { c -> c.productId == it.productId }?.quantity ?: 0
-                        val delta = it.quantity - existingQty
-                        if (delta != 0) {
-                            cartManager.addOrUpdate(it.productId, it.name, it.price, delta, it.imageUrl)
-                        } else {
-                            // Si solo cambió el precio y no la cantidad, forzar actualización
-                            cartManager.addOrUpdate(it.productId, it.name, it.price, 0, it.imageUrl)
-                        }
-                    }
                     val coordinator = CheckoutCoordinator(requireContext())
                     val (order, shipment) = withContext(Dispatchers.IO) {
-                        coordinator.checkout(cartManager.getItems(), address, acceptPayment = true)
+                        coordinator.checkout(items, address, acceptPayment = true)
                     }
                     cartManager.clear()
                     Toast.makeText(requireContext(), "Orden ${order.id} ${order.status}", Toast.LENGTH_LONG).show()
-                    parentFragmentManager.beginTransaction()
-                        .replace((view.parent as ViewGroup).id, com.miapp.greenbunny.ui.fragments.OrderConfirmationFragment.newInstance(order, shipment))
-                        .addToBackStack(null)
-                        .commit()
+                    val containerId = (view.parent as ViewGroup).id
+                    if (shipment != null) {
+                        parentFragmentManager.beginTransaction()
+                            .replace(containerId, com.miapp.greenbunny.ui.fragments.ShipmentTrackingFragment.newInstance(shipment))
+                            .addToBackStack(null)
+                            .commit()
+                    } else {
+                        parentFragmentManager.beginTransaction()
+                            .replace(containerId, com.miapp.greenbunny.ui.fragments.OrderConfirmationFragment.newInstance(order, null))
+                            .addToBackStack(null)
+                            .commit()
+                    }
                 } catch (e: Exception) {
                     Toast.makeText(requireContext(), "Error en checkout: ${e.message}", Toast.LENGTH_LONG).show()
                 } finally {
