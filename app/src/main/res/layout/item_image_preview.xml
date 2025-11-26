@@ -2,6 +2,6 @@
     android:id="@+id/ivPreviewItem"
     android:layout_width="100dp"
     android:layout_height="100dp"
-    android:scaleType="centerCrop"
+    android:scaleType="centerInside"
     android:layout_margin="4dp"
     android:contentDescription="@string/vista_previa_de_imagen_seleccionada" />

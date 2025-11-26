@@ -7,37 +7,43 @@
     android:padding="16dp"
     android:background="@color/white">
 
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpProductImages"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:layout_marginBottom="12dp" />
+
     <TextView
         android:id="@+id/tvProductName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:textStyle="bold"
-        android:textSize="18sp" />
+        android:textSize="20sp"
+        android:layout_marginBottom="4dp" />
 
     <TextView
         android:id="@+id/tvProductPrice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black" />
+        android:textColor="@color/verde_claro"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/tvProductDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/tvProductStock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/black" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/vpProductImages"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="8dp" />
+        android:textColor="@color/black"
+        android:layout_marginBottom="12dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
