@@ -35,6 +35,7 @@ class CreateUserDialogFragment(private val onUserCreated: (() -> Unit)? = null) 
         val adapterRoles = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, roles)
         adapterRoles.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spRole.adapter = adapterRoles
+        binding.spRole.setSelection(1)
 
         val statuses = listOf("activo", "inactivo")
         val adapterStatus = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, statuses)
