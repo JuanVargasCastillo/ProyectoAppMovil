@@ -27,8 +27,10 @@ class OrderConfirmationFragment : Fragment() {
         binding.tvOrderStatus.text = "Estado orden: ${order.status}"
         binding.tvOrderTotal.text = "Total: ${order.total}"
         if (shipment != null) {
-            binding.tvShipmentAddress.text = "Dirección: ${shipment.address}"
-            binding.tvShipmentStatus.text = "Estado envío: ${shipment.status}"
+            val addr = shipment.address ?: "-"
+            val st = shipment.status ?: "-"
+            binding.tvShipmentAddress.text = "Dirección: $addr"
+            binding.tvShipmentStatus.text = "Estado envío: $st"
         } else {
             binding.tvShipmentAddress.text = "Dirección: -"
             binding.tvShipmentStatus.text = "Estado envío: -"

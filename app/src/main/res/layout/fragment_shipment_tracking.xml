@@ -1,36 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tvShipmentId"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textColor="@color/black"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvShipmentAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"/>
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Seguimiento de Envío"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tvShipmentId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tvShipmentAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/tvShipmentStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    <TextView
-        android:id="@+id/tvShipmentStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/black"/>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVolver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/verde_claro"
+            android:textColor="@color/white"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnVolver"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Volver"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="@color/verde_claro"
-        android:textColor="@color/white"/>
+    </LinearLayout>
 
-</LinearLayout>
+</ScrollView>
