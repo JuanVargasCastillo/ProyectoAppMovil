@@ -1,17 +1,18 @@
 package com.miapp.greenbunny.model
 
+import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 data class Order(
-    val id: Int,
-    val created_at: Long?,
-    val total: Int,
-    val status: String,
-    val user_id: Int?
+    @SerializedName("id") val id: Int,
+    @SerializedName("created_at") val created_at: Long?,
+    @SerializedName("total") val total: Int,
+    @SerializedName(value = "status", alternate = ["estado"]) val status: String,
+    @SerializedName(value = "user_id", alternate = ["usuario_id"]) val user_id: Int?
 ) : Serializable
 
 data class CreateOrderRequest(
-    val total: Int,
+    @SerializedName("total") val total: Int,
     val status: String = "pendiente"
 )
 

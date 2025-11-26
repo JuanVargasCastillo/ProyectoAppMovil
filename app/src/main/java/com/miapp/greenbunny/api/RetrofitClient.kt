@@ -32,6 +32,7 @@ object RetrofitClient { // Objeto singleton que expone métodos de fábrica
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
     }
 
     // Construye Retrofit con baseUrl y cliente.
