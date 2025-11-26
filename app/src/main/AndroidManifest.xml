@@ -11,6 +11,9 @@
         <activity
             android:name=".ui.ProductDetailActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.ProductDetailHostActivity"
+            android:exported="false" />
         <!-- Activity principal: Login -->
         <activity
             android:name=".ui.MainActivity"
@@ -20,9 +23,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Activity secundaria: Home con Bottom Navigation -->
+        </activity>
         <activity
-            android:name=".ui.HomeActivity"
+            android:name=".ui.HomeActivityAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".ui.HomeActivityCliente"
             android:exported="false" />
     </application>
 

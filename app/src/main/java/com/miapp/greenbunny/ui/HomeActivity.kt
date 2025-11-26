@@ -1,8 +1,6 @@
 package com.miapp.greenbunny.ui
 
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.miapp.greenbunny.api.TokenManager
@@ -12,7 +10,7 @@ import com.miapp.greenbunny.ui.fragments.AddProductFragment
 import com.miapp.greenbunny.ui.fragments.ProductsFragment
 import com.miapp.greenbunny.ui.fragments.ProfileFragment
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivityAdmin : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var tokenManager: TokenManager
@@ -26,12 +24,6 @@ class HomeActivity : AppCompatActivity() {
 
         // Saludo
         binding.tvWelcome.text = "Hola ${tokenManager.getUserName()}!"
-
-        // Rol actual
-        val role = tokenManager.getUserRole()
-        Log.d("HomeActivity", "Role en sesión: $role")
-        Toast.makeText(this, "Role en sesión: $role", Toast.LENGTH_LONG).show()
-
 
         binding.bottomNav.menu.findItem(com.miapp.greenbunny.R.id.nav_users)?.isVisible = true
 

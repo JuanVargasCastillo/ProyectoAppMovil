@@ -39,7 +39,7 @@ class ProductAdapter(private var products: List<Product> = emptyList()) :
         }
 
         holder.itemView.setOnClickListener {
-            val intent = Intent(holder.itemView.context, ProductDetailActivity::class.java)
+            val intent = Intent(holder.itemView.context, com.miapp.greenbunny.ui.ProductDetailHostActivity::class.java)
             intent.putExtra("PRODUCT_EXTRA", product)
             holder.itemView.context.startActivity(intent)
         }

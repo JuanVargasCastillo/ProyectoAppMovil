@@ -12,6 +12,9 @@ interface UserService {
     @GET("user")
     suspend fun getUsers(): List<User>
 
+    @GET("user/{id}")
+    suspend fun getUser(@Path("id") id: Int): User
+
     @PATCH("user/{id}")
     suspend fun updateUser(@Path("id") id: Int, @Body request: UpdateUserRequest): User
 

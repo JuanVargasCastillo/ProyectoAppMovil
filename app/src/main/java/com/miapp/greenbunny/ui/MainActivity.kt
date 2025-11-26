@@ -76,27 +76,38 @@ class MainActivity : AppCompatActivity() {
                         userId = null
                     )
 
-                    // 3️⃣ Servicio privado con token
+                    // 3️⃣ Servicio privado con token → obtener perfil básico
                     val privateAuthService = RetrofitClient.createAuthService(this@MainActivity, requiresAuth = true)
-                    val userProfile = withContext(Dispatchers.IO) {
-                        privateAuthService.getMe()
+                    val me = withContext(Dispatchers.IO) { privateAuthService.getMe() }
+
+                    Log.d("MainActivity", "JSON /auth/me: ${Gson().toJson(me)}")
+
+                    // 4️⃣ Si faltan role/status, completar con GET /user/{id}
+                    val userService = RetrofitClient.createUserService(this@MainActivity)
+                    val fullUser = withContext(Dispatchers.IO) { userService.getUser(me.id) }
+
+                    val role = fullUser.role ?: me.role
+                    val status = fullUser.status?.lowercase()
+
+                    // 5️⃣ Respetar cuenta bloqueada
+                    val blockedStatuses = setOf("blocked", "bloqueado", "inactive", "inactivo")
+                    if (status in blockedStatuses) {
+                        tokenManager.clear()
+                        Toast.makeText(this@MainActivity, "Tu cuenta está bloqueada. Contacta al administrador.", Toast.LENGTH_LONG).show()
+                        return@launch
                     }
 
-                    // Logs de depuración del perfil recibido
-                    Log.d("MainActivity", "JSON /auth/me: ${Gson().toJson(userProfile)}")
-                    Log.d("MainActivity", "role antes de guardar: ${userProfile.role}")
-
-                    // 4️⃣ Guardar token + usuario formalmente
+                    // 6️⃣ Guardar sesión con role y status reales
                     tokenManager.saveAuth(
                         token = authToken,
-                        userName = userProfile.name ?: "",
-                        userEmail = userProfile.email ?: "",
-                        userRole = userProfile.role,
-                        userId = userProfile.id
+                        userName = fullUser.name ?: me.name ?: "",
+                        userEmail = fullUser.email ?: me.email ?: "",
+                        userRole = role,
+                        userId = fullUser.id,
+                        userStatus = status
                     )
 
-                    // 5️⃣ Bienvenida y navegación
-                    Toast.makeText(this@MainActivity, "¡Bienvenido, ${userProfile.name}!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "¡Bienvenido, ${fullUser.name ?: me.name}!", Toast.LENGTH_SHORT).show()
                     goToHome()
 
                 } catch (e: Exception) {
@@ -111,7 +122,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun goToHome() {
-        startActivity(Intent(this, HomeActivity::class.java))
+        val role = tokenManager.getUserRole()?.lowercase()
+        val dest = if (role == "admin") HomeActivityAdmin::class.java else HomeActivityCliente::class.java
+        startActivity(Intent(this, dest))
         finish()
     }
 }

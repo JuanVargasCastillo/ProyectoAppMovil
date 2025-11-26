@@ -37,9 +37,9 @@ class ProductDetailActivity : AppCompatActivity() {
         product?.let { prod ->
             displayProduct(prod)
 
-            // Editar: navega a HomeActivity con el producto a editar
+            // Editar: navega a HomeActivityAdmin con el producto a editar
             binding.btnEdit.setOnClickListener {
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, HomeActivityAdmin::class.java)
                 intent.putExtra("PRODUCT_TO_EDIT", prod)
                 startActivity(intent)
             }
